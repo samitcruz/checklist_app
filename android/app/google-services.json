@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "666528643307",
+    "project_id": "etgroundchecklist",
+    "storage_bucket": "etgroundchecklist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666528643307:android:489f0bc8a1e0631ef3e6ae",
+        "android_client_info": {
+          "package_name": "com.example.safety_check"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPRpeoK1S0Txv_2lYZF_9ijyMHQXXqqXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666528643307:android:3fb611ed0b8cecb4f3e6ae",
+        "android_client_info": {
+          "package_name": "com.example.sagety_check"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPRpeoK1S0Txv_2lYZF_9ijyMHQXXqqXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
