@@ -81,7 +81,7 @@ class MainPage extends StatelessWidget {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.home,
             color: Colors.white,
             size: 30,
