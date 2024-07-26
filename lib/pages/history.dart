@@ -37,7 +37,7 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             TextField(
               controller: searchController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Search",
                 hintText: "Enter Station Name, Flight Number or Date",
                 prefixIcon: Icon(Icons.search),
