@@ -1,13 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 import 'package:safety_check/pages/main_page.dart';
 
-class ChecklistPage extends StatelessWidget {
+class ChecklistPage extends StatefulWidget {
   final String title;
   final List<String> items;
   final Widget nextPage;
@@ -34,32 +37,62 @@ class ChecklistPage extends StatelessWidget {
           ),
         );
 
-  void _showRemarkDialog(int index) {
+  @override
+  State<ChecklistPage> createState() => _ChecklistPageState();
+}
+
+class _ChecklistPageState extends State<ChecklistPage> {
+  void _showRemarkDialog(int index) async {
     TextEditingController remarkController = TextEditingController();
-    remarkController.text = checklistStatus[index]['Remark'];
-    Get.defaultDialog(
+    remarkController.text = widget.checklistStatus[index]['Remark'] ?? '';
+    XFile? imageFile;
+
+    // Show dialog to enter remark and select image
+    await Get.defaultDialog(
       title: 'Enter Remark',
       titleStyle: GoogleFonts.openSans(),
-      content: TextField(
-        controller: remarkController,
-        decoration: InputDecoration(
-          hintText: 'Enter Remark',
-          hintStyle: GoogleFonts.openSans(),
-        ),
+      content: Column(
+        children: [
+          TextField(
+            controller: remarkController,
+            decoration: InputDecoration(
+              hintText: 'Enter Remark',
+              hintStyle: GoogleFonts.openSans(),
+            ),
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () async {
+              final picker = ImagePicker();
+              imageFile = await picker.pickImage(source: ImageSource.gallery);
+              if (imageFile != null) {
+                setState(() {
+                  widget.checklistStatus[index]['Image'] = imageFile!.path;
+                });
+              }
+            },
+            child: Text('Select Image'),
+          ),
+          if (imageFile != null) ...[
+            SizedBox(height: 16),
+            Image.file(File(imageFile!.path)),
+          ],
+        ],
       ),
       buttonColor: Color.fromARGB(255, 82, 138, 41),
       textConfirm: 'Save',
       confirmTextColor: Colors.white,
       onConfirm: () {
-        checklistStatus[index]['Remark'] = remarkController.text;
-        checklistStatus.refresh();
+        widget.checklistStatus[index]['Remark'] = remarkController.text;
+        widget.checklistStatus[index]['Image'] = imageFile?.path;
+        widget.checklistStatus.refresh();
         Get.back();
       },
     );
   }
 
   bool _isChecklistComplete() {
-    for (var status in checklistStatus) {
+    for (var status in widget.checklistStatus) {
       if (!status['Yes'] && !status['No']) {
         return false;
       }
@@ -71,7 +104,7 @@ class ChecklistPage extends StatelessWidget {
     if (_isChecklistComplete()) {
       _saveChecklistData();
 
-      if (isLastPage) {
+      if (widget.isLastPage) {
         Get.offAll(MainPage());
         Get.snackbar(
           'Success',
@@ -80,7 +113,7 @@ class ChecklistPage extends StatelessWidget {
           colorText: Colors.white,
         );
       } else {
-        Get.to(nextPage);
+        Get.to(widget.nextPage);
       }
     } else {
       Get.snackbar(
@@ -94,38 +127,40 @@ class ChecklistPage extends StatelessWidget {
 
   Future<void> _saveChecklistData() async {
     try {
-      if (stationName.isEmpty || flightNumber.isEmpty || date.isEmpty) {
+      if (widget.stationName.isEmpty ||
+          widget.flightNumber.isEmpty ||
+          widget.date.isEmpty) {
         print("Error: One or more fields are empty");
         return;
       }
 
       print(
-          "Saving checklist data for station: $stationName, flight: $flightNumber, date: $date");
+          "Saving checklist data for station: ${widget.stationName}, flight: ${widget.flightNumber}, date: ${widget.date}");
 
       DocumentReference dateDocRef = FirebaseFirestore.instance
           .collection('inspections')
-          .doc(stationName)
+          .doc(widget.stationName)
           .collection('flights')
-          .doc(flightNumber)
+          .doc(widget.flightNumber)
           .collection('dates')
-          .doc(date);
+          .doc(widget.date);
 
       await dateDocRef.set({
-        'station': stationName,
-        'flightNumber': flightNumber,
-        'date': date,
+        'station': widget.stationName,
+        'flightNumber': widget.flightNumber,
+        'date': widget.date,
       });
 
       CollectionReference checklistRef = dateDocRef.collection('checklist');
 
-      for (int i = 0; i < totalItems; i++) {
-        String sanitizedTitle = title.replaceAll('/', '_');
-        String documentId = '${flightNumber}_${sanitizedTitle}_$i';
+      for (int i = 0; i < widget.totalItems; i++) {
+        String sanitizedTitle = widget.title.replaceAll('/', '_');
+        String documentId = '${widget.flightNumber}_${sanitizedTitle}_$i';
         await checklistRef.doc(documentId).set({
-          'item': items[i],
-          'Yes': checklistStatus[i]['Yes'],
-          'No': checklistStatus[i]['No'],
-          'Remark': checklistStatus[i]['Remark'],
+          'item': widget.items[i],
+          'Yes': widget.checklistStatus[i]['Yes'],
+          'No': widget.checklistStatus[i]['No'],
+          'Remark': widget.checklistStatus[i]['Remark'],
         });
       }
 
@@ -182,7 +217,7 @@ class ChecklistPage extends StatelessWidget {
         ],
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
         title: Text(
-          title,
+          widget.title,
           style: GoogleFonts.openSans(
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
@@ -197,7 +232,7 @@ class ChecklistPage extends StatelessWidget {
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: items.length,
+                  itemCount: widget.items.length,
                   itemBuilder: (context, index) {
                     return Obx(() {
                       return Padding(
@@ -207,32 +242,32 @@ class ChecklistPage extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                items[index],
+                                widget.items[index],
                                 style: GoogleFonts.openSans(fontSize: 16),
                               ),
                             ),
                             CustomCheckbox(
                               textStyle: GoogleFonts.openSans(fontSize: 16),
-                              value: checklistStatus[index]['Yes'],
+                              value: widget.checklistStatus[index]['Yes'],
                               onChanged: (value) {
-                                checklistStatus[index]['Yes'] = value!;
+                                widget.checklistStatus[index]['Yes'] = value!;
                                 if (value) {
-                                  checklistStatus[index]['No'] = false;
+                                  widget.checklistStatus[index]['No'] = false;
                                 }
-                                checklistStatus.refresh();
+                                widget.checklistStatus.refresh();
                               },
                               label: 'Yes',
                             ),
                             SizedBox(width: 16),
                             CustomCheckbox(
                               textStyle: GoogleFonts.openSans(fontSize: 16),
-                              value: checklistStatus[index]['No'],
+                              value: widget.checklistStatus[index]['No'],
                               onChanged: (value) {
-                                checklistStatus[index]['No'] = value!;
+                                widget.checklistStatus[index]['No'] = value!;
                                 if (value) {
-                                  checklistStatus[index]['Yes'] = false;
+                                  widget.checklistStatus[index]['Yes'] = false;
                                 }
-                                checklistStatus.refresh();
+                                widget.checklistStatus.refresh();
                               },
                               label: 'No',
                               isNoCheckbox: true,
@@ -264,7 +299,7 @@ class ChecklistPage extends StatelessWidget {
                   backgroundColor: const Color.fromARGB(255, 82, 138, 41),
                 ),
                 child: Text(
-                  isLastPage ? 'Submit Checklist' : 'Next Section',
+                  widget.isLastPage ? 'Submit Checklist' : 'Next Section',
                   style: GoogleFonts.openSans(),
                 ),
               ),
