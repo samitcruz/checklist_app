@@ -71,7 +71,7 @@ class _ChecklistPageState extends State<ChecklistPage> {
                 });
               }
             },
-            child: Text('Select Image'),
+            child: Text('Select an Image'),
           ),
           if (imageFile != null) ...[
             SizedBox(height: 16),
