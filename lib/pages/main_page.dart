@@ -1,18 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:safety_check/pages/generic_pages/preflight_arrivals.dart';
-import 'package:safety_check/pages/history.dart';
+import 'package:safety_check/api_service.dart';
+import 'package:safety_check/models/checklist_dto.dart';
 import 'help.dart';
 import 'notices.dart';
+import 'history.dart';
 
 // ignore: must_be_immutable
 class MainPage extends StatelessWidget {
   final TextEditingController stationController = TextEditingController();
   final TextEditingController flightNumberController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  final ApiService apiService = ApiService();
 
   DateTime selectedDate = DateTime.now();
 
@@ -40,35 +41,28 @@ class MainPage extends StatelessWidget {
     }
   }
 
-  Future<void> _saveToFirestore() async {
+  Future<void> _saveToAPI() async {
     try {
       String stationName = stationController.text;
       String flightNumber = flightNumberController.text;
       String date = dateController.text;
 
-      DocumentReference docRef = FirebaseFirestore.instance
-          .collection('inspections')
-          .doc(stationName)
-          .collection('flights')
-          .doc(flightNumber)
-          .collection('dates')
-          .doc(date);
+      ChecklistDto checklistDto = ChecklistDto(
+        stationName: stationName,
+        flightNumber: flightNumber,
+        date: date,
+      );
 
-      await docRef.set({
-        'station': stationName,
-        'flightNumber': flightNumber,
-        'date': date,
-      });
-
-      print("Data saved successfully");
-
-      Get.to(() => PreflightArrivals(
-            stationName: stationName,
-            flightNumber: flightNumber,
-            date: date,
-          ));
+      await apiService.createChecklist(checklistDto);
+      Get.to(() => HelpPage());
     } catch (e) {
-      print("Error saving data to Firestore: $e");
+      Get.snackbar(
+        'Error',
+        'Failed to save data to the server',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      print("Error saving data to the server: $e");
     }
   }
 
@@ -191,67 +185,53 @@ class MainPage extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                  child: GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(15)),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: dateController,
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(left: 20),
+                              hintText: 'Flight Date',
+                              border: InputBorder.none),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 50),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.white),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: TextFormField(
-                            onTap: () {
-                              _selectDate(context);
-                            },
-                            readOnly: true,
-                            controller: dateController,
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.only(left: 20, top: 12),
-                              hintText: 'Date (yyyy-mm-dd)',
-                              border: InputBorder.none,
-                              suffixIcon: GestureDetector(
-                                onTap: () {
-                                  _selectDate(context);
-                                },
-                                child: Icon(Icons.calendar_today,
-                                    size: 20, color: Colors.grey),
-                              ),
-                            ),
+                    Container(
+                      width: 200,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: _saveToAPI,
+                        child: Text(
+                          'Checklist',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 82, 138, 41),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                       ),
                     ),
                   ],
-                ),
-                SizedBox(height: 16),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (stationController.text.isNotEmpty &&
-                          flightNumberController.text.isNotEmpty &&
-                          dateController.text.isNotEmpty) {
-                        await _saveToFirestore();
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'Please fill all fields before proceeding',
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color.fromARGB(255, 82, 138, 41),
-                    ),
-                    child: Text(
-                      'Start Checklist',
-                      style: GoogleFonts.openSans(),
-                    ),
-                  ),
                 ),
               ],
             ),
