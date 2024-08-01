@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:safety_check/api_service.dart';
 import 'package:safety_check/models/checklist_dto.dart';
+import 'package:safety_check/pages/generic_pages/preflight_arrivals.dart';
 import 'help.dart';
 import 'notices.dart';
 import 'history.dart';
@@ -51,10 +52,22 @@ class MainPage extends StatelessWidget {
         stationName: stationName,
         flightNumber: flightNumber,
         date: date,
+        items: [],
       );
 
-      await apiService.createChecklist(checklistDto);
-      Get.to(() => HelpPage());
+      int checklistId = await apiService.createChecklist(
+        checklistDto,
+        flightNumber: flightNumber,
+        stationName: stationName,
+        date: date,
+      );
+
+      Get.to(() => PreflightArrivals(
+            stationName: stationName,
+            flightNumber: flightNumber,
+            date: date,
+            checklistId: checklistId, // Pass the checklist ID
+          ));
     } catch (e) {
       Get.snackbar(
         'Error',

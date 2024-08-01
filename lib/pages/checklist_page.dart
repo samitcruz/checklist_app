@@ -1,14 +1,13 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 import 'package:safety_check/pages/main_page.dart';
+import 'package:safety_check/api_service.dart';
 
 class ChecklistPage extends StatefulWidget {
   final String title;
@@ -42,6 +41,8 @@ class ChecklistPage extends StatefulWidget {
 }
 
 class _ChecklistPageState extends State<ChecklistPage> {
+  final ApiService apiService = ApiService();
+
   void _showRemarkDialog(int index) async {
     TextEditingController remarkController = TextEditingController();
     remarkController.text = widget.checklistStatus[index]['Remark'] ?? '';
@@ -127,46 +128,16 @@ class _ChecklistPageState extends State<ChecklistPage> {
 
   Future<void> _saveChecklistData() async {
     try {
-      if (widget.stationName.isEmpty ||
-          widget.flightNumber.isEmpty ||
-          widget.date.isEmpty) {
-        print("Error: One or more fields are empty");
-        return;
-      }
-
-      print(
-          "Saving checklist data for station: ${widget.stationName}, flight: ${widget.flightNumber}, date: ${widget.date}");
-
-      DocumentReference dateDocRef = FirebaseFirestore.instance
-          .collection('inspections')
-          .doc(widget.stationName)
-          .collection('flights')
-          .doc(widget.flightNumber)
-          .collection('dates')
-          .doc(widget.date);
-
-      await dateDocRef.set({
-        'station': widget.stationName,
-        'flightNumber': widget.flightNumber,
-        'date': widget.date,
-      });
-
-      CollectionReference checklistRef = dateDocRef.collection('checklist');
-
-      for (int i = 0; i < widget.totalItems; i++) {
-        String sanitizedTitle = widget.title.replaceAll('/', '_');
-        String documentId = '${widget.flightNumber}_${sanitizedTitle}_$i';
-        await checklistRef.doc(documentId).set({
-          'item': widget.items[i],
-          'Yes': widget.checklistStatus[i]['Yes'],
-          'No': widget.checklistStatus[i]['No'],
-          'Remark': widget.checklistStatus[i]['Remark'],
-        });
-      }
-
+      await apiService.saveChecklistData(
+        widget.stationName,
+        widget.flightNumber,
+        widget.date,
+        widget.checklistStatus,
+        widget.title,
+      );
       print("Checklist data saved successfully");
     } catch (e) {
-      print("Error saving checklist data to Firestore: $e");
+      print("Error saving checklist data: $e");
     }
   }
 

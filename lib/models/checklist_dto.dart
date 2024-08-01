@@ -1,4 +1,3 @@
-// models/checklist_dto.dart
 class ChecklistDto {
   String stationName;
   String flightNumber;
@@ -7,7 +6,7 @@ class ChecklistDto {
   ChecklistDto({
     required this.stationName,
     required this.flightNumber,
-    required this.date,
+    required this.date, required List<dynamic> items,
   });
 
   Map<String, dynamic> toJson() {
