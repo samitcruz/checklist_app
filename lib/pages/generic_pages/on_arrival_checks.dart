@@ -1,41 +1,150 @@
 import 'package:flutter/material.dart';
-import 'package:safety_check/pages/generic_pages/aircraft_fueling.dart';
-import 'package:safety_check/pages/checklist_page.dart';
+import 'package:safety_check/api_service.dart';
+import 'package:safety_check/models/checklist_item.dart';
 
-class OnArrivalChecks extends StatelessWidget {
+class OnArrivalChecks extends StatefulWidget {
   final String stationName;
   final String flightNumber;
   final String date;
+  final int checklistId;
 
   OnArrivalChecks({
     required this.stationName,
     required this.flightNumber,
     required this.date,
+    required this.checklistId,
   });
+
+  @override
+  _OnArrivalChecksState createState() => _OnArrivalChecksState();
+}
+
+class _OnArrivalChecksState extends State<OnArrivalChecks> {
+  List<ChecklistItem> items = [];
+  ApiService apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    items = [
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'No staff/Equipment approached before engine off, anti-collision beacon & aircraft is chocked on and marshaller gives clearance.',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description: 'Aircraft parked at right spot',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description: 'Chocks placed per standard/aircraft type',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Twice brake checks made while equipment approaches aircraft',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Reasonable clearance is left between the aircraft and the equipment positioned',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Stabilizers are set for all equipment positioned to the aircrafte',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Check for any damage on the door area before opening cabin/cargo door',
+          yes: false,
+          no: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description: 'Equipment are not operated under the aircraft wing.',
+          yes: false,
+          no: false),
+    ];
+  }
+
+  void _saveChecklist() async {
+    try {
+      for (var item in items) {
+        var createDto = item.toCreateDto();
+        await apiService.createChecklistItem(widget.checklistId, createDto);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Checklist saved successfully!')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save checklist: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ChecklistPage(
-      title: 'On Arrival/During Operation Checks',
-      items: [
-        '1. No staff/Equipment approached before engine off, anti-collision beacon & aircraft is chocked on and marshaller gives clearance. ',
-        '2. Aircraft parked at right spot',
-        '3. Chocks placed per standard/aircraft type',
-        '4. Safety Cones placed per standard',
-        '5. Check for physical damage on Aircraft before any activity',
-        '6. Twice brake checks made while equipment approaches aircraft',
-        '7. Reasonable clearance is left between the aircraft and the equipment positioned',
-        '8. Stabilizers are set for all equipment positioned to the aircraft ',
-        '9. Check for any damage on the door area before opening cabin/cargo door',
-        '10. Equipment are not operated under the aircraft wing. ',
-      ],
-      nextPage: AircraftFueling(
-        stationName: stationName,
-        flightNumber: flightNumber,
-        date: date,
+    return Scaffold(
+      appBar: AppBar(title: Text('Preflight Arrivals')),
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          ChecklistItem item = items[index];
+          return ListTile(
+            title: Text(item.description),
+            subtitle: Row(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: item.yes,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            item.yes = value ?? false;
+                            if (item.yes)
+                              item.no = false; // Ensure mutual exclusivity
+                          });
+                        },
+                      ),
+                      Text('Yes'),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: item.no,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            item.no = value ?? false;
+                            if (item.no)
+                              item.yes = false; // Ensure mutual exclusivity
+                          });
+                        },
+                      ),
+                      Text('No'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
-      stationName: stationName,
-      flightNumber: flightNumber,
-      date: date,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _saveChecklist,
+        child: Icon(Icons.save),
+      ),
     );
   }
 }
