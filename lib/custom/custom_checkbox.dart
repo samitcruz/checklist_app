@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:get/get.dart';
 
 class CustomCheckbox extends StatelessWidget {
   final bool value;
@@ -29,7 +28,7 @@ class CustomCheckbox extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               border: Border.all(
-                color: value ? Colors.green : Colors.grey,
+                color: value ? (isNoCheckbox ? Colors.red : Colors.green) : Colors.grey,
                 width: 2.0,
               ),
               color: value ? Colors.transparent : Colors.transparent,

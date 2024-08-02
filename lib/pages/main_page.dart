@@ -66,7 +66,7 @@ class MainPage extends StatelessWidget {
             stationName: stationName,
             flightNumber: flightNumber,
             date: date,
-            checklistId: checklistId, // Pass the checklist ID
+            checklistId: checklistId,
           ));
     } catch (e) {
       Get.snackbar(

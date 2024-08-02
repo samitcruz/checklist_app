@@ -42,6 +42,7 @@ dependencies:
     ^5.0.2
   image_picker: ^1.1.2
   http: ^1.2.2
+  http_parser: ^4.0.2
     #firebase_auth: ^5.1.2
 
 dev_dependencies:
