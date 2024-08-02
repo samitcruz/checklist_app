@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:safety_check/api_service.dart';
@@ -75,9 +73,10 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
   }
 
   void _showRemarkDialog(int index) async {
-    // ignore: unused_local_variable
-    String remarkText = '';
-    XFile? imageFile;
+    TextEditingController remarkController = TextEditingController(
+      text: items[index].remarkText ?? '',
+    );
+    String? imagePath = items[index].remarkImagePath;
 
     await showDialog(
       context: context,
@@ -88,8 +87,10 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                controller: remarkController,
                 onChanged: (value) {
-                  remarkText = value;
+                  // Update the remark text in the item
+                  items[index].remarkText = value;
                 },
                 decoration: InputDecoration(
                   labelText: 'Enter your remark',
@@ -102,9 +103,12 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                     onPressed: () async {
                       final XFile? pickedFile =
                           await _picker.pickImage(source: ImageSource.camera);
-                      setState(() {
-                        imageFile = pickedFile;
-                      });
+                      if (pickedFile != null) {
+                        setState(() {
+                          imagePath = pickedFile.path; // Store the image path
+                          items[index].remarkImagePath = imagePath;
+                        });
+                      }
                     },
                     child: Text('Take a Photo'),
                   ),
@@ -112,18 +116,21 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                     onPressed: () async {
                       final XFile? pickedFile =
                           await _picker.pickImage(source: ImageSource.gallery);
-                      setState(() {
-                        imageFile = pickedFile;
-                      });
+                      if (pickedFile != null) {
+                        setState(() {
+                          imagePath = pickedFile.path;
+                          items[index].remarkImagePath = imagePath;
+                        });
+                      }
                     },
                     child: Text('Upload a Photo'),
                   ),
                 ],
               ),
-              if (imageFile != null) ...[
+              if (imagePath != null) ...[
                 SizedBox(height: 10),
                 Image.file(
-                  File(imageFile!.path),
+                  File(imagePath!),
                   height: 100,
                   width: 100,
                   fit: BoxFit.cover,
@@ -140,7 +147,9 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
             ),
             TextButton(
               onPressed: () {
-                // Handle saving the remark and image if necessary
+                setState(() {
+                  items[index].remarkText = remarkController.text;
+                });
                 Navigator.of(context).pop();
               },
               child: Text('Save'),
@@ -155,18 +164,22 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
     try {
       for (var item in items) {
         var createDto = item.toCreateDto();
-        await apiService.createChecklistItem(widget.checklistId, createDto);
+        await apiService.createChecklistItem(createDto);
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Checklist saved successfully!')));
+        SnackBar(content: Text('Checklist and remarks saved successfully!')),
+      );
       Get.to(() => OnArrivalChecks(
-            checklistId: widget.checklistId, stationName: '', flightNumber: '',
-            date: '', // Pass the checklist ID
+            checklistId: widget.checklistId,
+            stationName: widget.stationName,
+            flightNumber: widget.flightNumber,
+            date: widget.date,
           ));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save checklist: $e')));
+        SnackBar(content: Text('Failed to save checklist: $e')),
+      );
     }
   }
 
@@ -232,7 +245,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           );

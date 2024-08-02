@@ -75,20 +75,20 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
     ];
   }
 
-  void _saveChecklist() async {
-    try {
-      for (var item in items) {
-        var createDto = item.toCreateDto();
-        await apiService.createChecklistItem(widget.checklistId, createDto);
-      }
+  // void _saveChecklist() async {
+  //   try {
+  //     for (var item in items) {
+  //       var createDto = item.toCreateDto();
+  //       await apiService.createChecklistItem(widget.checklistId, createDto);
+  //     }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Checklist saved successfully!')));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save checklist: $e')));
-    }
-  }
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Checklist saved successfully!')));
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to save checklist: $e')));
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +142,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _saveChecklist,
+        onPressed: () {},
         child: Icon(Icons.save),
       ),
     );

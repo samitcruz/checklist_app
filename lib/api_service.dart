@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:safety_check/models/checklist_dto.dart';
 import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/models/checklist_model.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://localhost:7236/api';
+  static const String _baseUrl = 'https://172.20.45.69:7236/api';
 
   Future<List<Checklist>> getChecklists() async {
     final response = await http.get(Uri.parse('$_baseUrl/Checklist'));
@@ -46,16 +47,43 @@ class ApiService {
     }
   }
 
-Future<void> createChecklistItem(int checklistId, ChecklistItemCreateDto createDto) async {
-    final url = Uri.parse('$_baseUrl/ChecklistItem');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(createDto.toJson()),
-    );
+  Future<void> createChecklistItem(ChecklistItemCreateDto createDto) async {
+    var uri = Uri.parse('$_baseUrl/checklistitem');
+    var request = http.MultipartRequest('POST', uri);
 
-    if (response.statusCode != 201) {
-      throw Exception('Failed to create checklist item');
+    // Add checklist item fields
+    request.fields['ChecklistId'] = createDto.checklistId.toString();
+    request.fields['Description'] = createDto.description;
+    request.fields['Yes'] = createDto.yes.toString();
+    request.fields['No'] = createDto.no.toString();
+    if (createDto.remarkText != null) {
+      request.fields['RemarkText'] = createDto.remarkText!;
+    } else {
+      request.fields['RemarkText'] = ''; // Send an empty string if null
+    }
+
+    if (createDto.remarkImagePath != null) {
+      var file = await http.MultipartFile.fromPath(
+        'RemarkImage',
+        createDto.remarkImagePath!,
+        contentType:
+            MediaType('image', 'jpeg'), // Adjust content type if needed
+      );
+      request.files.add(file);
+    }
+
+    try {
+      var response = await request.send();
+      var responseBody = await response.stream.bytesToString();
+      if (response.statusCode != 201) {
+        // Changed to 201 Created status code
+        throw Exception(
+            'Failed to create checklist item: ${response.statusCode} - $responseBody');
+      }
+      print('Response: $responseBody');
+    } catch (e) {
+      print('Error during API request: $e');
+      throw Exception('Error during API request: $e');
     }
   }
 
@@ -79,6 +107,20 @@ Future<void> createChecklistItem(int checklistId, ChecklistItemCreateDto createD
     }
   }
 
+  Future<void> updateChecklistItemRemark(
+      int id, ChecklistItemRemarkDto remarkDto) async {
+    final url = Uri.parse('$_baseUrl/Checklist/$id/remark');
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(remarkDto.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update checklist item remark');
+    }
+  }
+
   Future<void> saveChecklistData(
       String stationName,
       String flightNumber,
@@ -86,7 +128,7 @@ Future<void> createChecklistItem(int checklistId, ChecklistItemCreateDto createD
       List<Map<String, dynamic>> checklistStatus,
       String title) async {
     try {
-      final url = Uri.parse('$_baseUrl/saveChecklist');
+      final url = Uri.parse('$_baseUrl/Checklist');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
