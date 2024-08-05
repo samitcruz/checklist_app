@@ -199,15 +199,24 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
   }
 
   void _saveChecklist() async {
+    for (var item in items) {
+      if (!item.yes && !item.no) {
+        Get.snackbar(
+          'Incomplete Checklist',
+          'Please complete all checklist items before proceeding',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+    }
+
     try {
       for (var item in items) {
         var createDto = item.toCreateDto();
         await apiService.createChecklistItem(createDto);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Checklist and remarks saved successfully!')),
-      );
       Get.to(() => OnArrivalChecks(
             checklistId: widget.checklistId,
             stationName: widget.stationName,
@@ -215,8 +224,11 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
             date: widget.date,
           ));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save checklist: $e')),
+      Get.snackbar(
+        'Error',
+        'An error occurred while saving the checklist',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     }
   }
