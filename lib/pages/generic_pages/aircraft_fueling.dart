@@ -74,6 +74,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: TextStyle(color: Color.fromARGB(255, 82, 138, 41)),
           title: Text('Add Remark'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -185,7 +186,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
     );
   }
 
-    void _saveChecklist() async {
+  void _saveChecklist() async {
     for (var item in items) {
       if (!item.yes && !item.no) {
         Get.snackbar(

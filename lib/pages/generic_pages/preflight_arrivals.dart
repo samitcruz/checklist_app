@@ -87,7 +87,8 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Remark'),
+          titleTextStyle: TextStyle(color: Color.fromARGB(255, 82, 138, 41)),
+          title: Text('Add Remark,'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -97,6 +98,8 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                   items[index].remarkText = value;
                 },
                 decoration: InputDecoration(
+                  // labelStyle:
+                  //     TextStyle(color: const Color.fromARGB(2255, 82, 138, 41)),
                   labelText: 'Enter your remark',
                 ),
               ),

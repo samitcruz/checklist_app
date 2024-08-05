@@ -97,6 +97,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: TextStyle(color: Color.fromARGB(255, 82, 138, 41)),
           title: Text('Add Remark'),
           content: Column(
             mainAxisSize: MainAxisSize.min,

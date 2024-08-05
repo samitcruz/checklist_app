@@ -107,6 +107,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: TextStyle(color: Color.fromARGB(255, 82, 138, 41)),
           title: Text('Add Remark'),
           content: Column(
             mainAxisSize: MainAxisSize.min,

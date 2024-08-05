@@ -137,7 +137,7 @@ class MainPage extends StatelessWidget {
         centerTitle: false,
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
         title: Text(
-          'Take an Inspection',
+          'Ethiopian Airlines Ground Safety',
           style: GoogleFonts.openSans(
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
