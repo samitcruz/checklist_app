@@ -7,7 +7,7 @@ import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 import 'package:safety_check/pages/main_page.dart';
-import 'package:safety_check/api_service.dart';
+import 'package:safety_check/pages/Services/api_service.dart';
 
 class ChecklistPage extends StatefulWidget {
   final String title;

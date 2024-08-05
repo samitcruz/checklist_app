@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:safety_check/api_service.dart';
+import 'package:safety_check/pages/Services/api_service.dart';
 import 'package:safety_check/models/checklist_dto.dart';
 import 'package:safety_check/pages/generic_pages/preflight_arrivals.dart';
 import 'help.dart';
@@ -150,7 +150,15 @@ class MainPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Center(child: Image.asset('images/et.png')),
+                SizedBox(
+                  height: 40,
+                ),
+                Center(
+                    child: Image.asset(
+                  'images/EtLogo.jpg',
+                  width: 400,
+                  height: 200,
+                )),
                 SizedBox(height: 30),
                 Row(
                   children: [

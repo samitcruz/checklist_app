@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:safety_check/api_service.dart';
+import 'package:safety_check/pages/Services/api_service.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/pages/generic_pages/on_arrival_checks.dart';
