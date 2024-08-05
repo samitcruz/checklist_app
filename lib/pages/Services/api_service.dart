@@ -6,7 +6,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:safety_check/models/checklist_item_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://192.168.1.2:7236/api';
+  static const String _baseUrl = 'https://172.20.45.98:7236/api';
 
   Future<List<Checklist>> getChecklists() async {
     final response = await http.get(Uri.parse('$_baseUrl/Checklist'));

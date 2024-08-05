@@ -17,6 +17,7 @@ class MainPage extends StatelessWidget {
   final ApiService apiService = ApiService();
 
   DateTime selectedDate = DateTime.now();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -43,39 +44,41 @@ class MainPage extends StatelessWidget {
   }
 
   Future<void> _saveToAPI() async {
-    try {
-      String stationName = stationController.text;
-      String flightNumber = flightNumberController.text;
-      String date = dateController.text;
+    if (_formKey.currentState!.validate()) {
+      try {
+        String stationName = stationController.text;
+        String flightNumber = flightNumberController.text;
+        String date = dateController.text;
 
-      ChecklistDto checklistDto = ChecklistDto(
-        stationName: stationName,
-        flightNumber: flightNumber,
-        date: date,
-        items: [],
-      );
+        ChecklistDto checklistDto = ChecklistDto(
+          stationName: stationName,
+          flightNumber: flightNumber,
+          date: date,
+          items: [],
+        );
 
-      int checklistId = await apiService.createChecklist(
-        checklistDto,
-        flightNumber: flightNumber,
-        stationName: stationName,
-        date: date,
-      );
+        int checklistId = await apiService.createChecklist(
+          checklistDto,
+          flightNumber: flightNumber,
+          stationName: stationName,
+          date: date,
+        );
 
-      Get.to(() => PreflightArrivals(
-            stationName: stationName,
-            flightNumber: flightNumber,
-            date: date,
-            checklistId: checklistId,
-          ));
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to save data to the server',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-      print("Error saving data to the server: $e");
+        Get.to(() => PreflightArrivals(
+              stationName: stationName,
+              flightNumber: flightNumber,
+              date: date,
+              checklistId: checklistId,
+            ));
+      } catch (e) {
+        Get.snackbar(
+          'Error',
+          'Failed to save data to the server',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        print("Error saving data to the server: $e");
+      }
     }
   }
 
@@ -146,115 +149,134 @@ class MainPage extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child: Padding(
             padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 40,
-                ),
-                Center(
-                    child: Image.asset(
-                  'images/EtLogo.jpg',
-                  width: 400,
-                  height: 200,
-                )),
-                SizedBox(height: 30),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.white),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: TextFormField(
-                            controller: stationController,
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 20),
-                                hintText: 'Station Name',
-                                border: InputBorder.none),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 40),
+                  Center(
+                      child: Image.asset(
+                    'images/EtLogo.jpg',
+                    width: 400,
+                    height: 200,
+                  )),
+                  SizedBox(height: 30),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Colors.white),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: TextFormField(
+                              controller: stationController,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 20),
+                                  hintText: 'Station Name',
+                                  border: InputBorder.none),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter the station name';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.white),
-                              borderRadius: BorderRadius.circular(15)),
-                          child: TextFormField(
-                            controller: flightNumberController,
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 20),
-                                hintText: 'Flight Number',
-                                border: InputBorder.none),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Colors.white),
+                                borderRadius: BorderRadius.circular(15)),
+                            child: TextFormField(
+                              controller: flightNumberController,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.only(left: 20),
+                                  hintText: 'Flight Number',
+                                  border: InputBorder.none),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter the flight number';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                  child: GestureDetector(
-                    onTap: () => _selectDate(context),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(15)),
-                      child: AbsorbPointer(
-                        child: TextFormField(
-                          controller: dateController,
-                          decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              hintText: 'Flight Date',
-                              border: InputBorder.none),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                    child: GestureDetector(
+                      onTap: () => _selectDate(context),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(15)),
+                        child: AbsorbPointer(
+                          child: TextFormField(
+                            controller: dateController,
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(left: 20),
+                                hintText: 'Flight Date',
+                                border: InputBorder.none),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please select the flight date';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 50),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 200,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _saveToAPI,
-                        child: Text(
-                          'Checklist',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
+                  SizedBox(height: 50),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 200,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _saveToAPI,
+                          child: Text(
+                            'Checklist',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 82, 138, 41),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 82, 138, 41),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
