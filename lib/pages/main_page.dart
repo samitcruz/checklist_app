@@ -112,7 +112,7 @@ class MainPage extends StatelessWidget {
                   Get.to(NoticesPage());
                   break;
                 case 'History':
-                  Get.to(HistoryPage());
+                  Get.to(() => HistoryPage());
                   break;
               }
             },
