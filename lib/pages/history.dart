@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:safety_check/models/checklist_item.dart';
+import 'package:safety_check/pages/Services/api_service.dart';
+import 'package:safety_check/models/checklist.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -11,6 +13,25 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   TextEditingController searchController = TextEditingController();
   String searchString = "";
+  List<Checklist> checklistData = [];
+  ApiService apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchChecklists();
+  }
+
+  Future<void> fetchChecklists() async {
+    try {
+      List<Checklist> data = await apiService.getChecklists();
+      setState(() {
+        checklistData = data;
+      });
+    } catch (e) {
+      print('Failed to fetch checklists: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,71 +73,43 @@ class _HistoryPageState extends State<HistoryPage> {
               },
             ),
             Expanded(
-              child: StreamBuilder(
-                stream: FirebaseFirestore.instance
-                    .collectionGroup('dates')
-                    .snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) return const Text("Loading...");
-                  var results = snapshot.data!.docs.where((doc) {
-                    var data = doc.data() as Map<String, dynamic>?;
-                    if (data == null) return false;
+              child: ListView.builder(
+                itemCount: checklistData.length,
+                itemBuilder: (context, index) {
+                  var data = checklistData[index];
+                  String station = data.stationName;
+                  String flightNumber = data.flightNumber;
+                  String date = data.date;
 
-                    String station = data.containsKey('station')
-                        ? data['station'].toString().toLowerCase()
-                        : "";
-                    String flightNumber = data.containsKey('flightNumber')
-                        ? data['flightNumber'].toString().toLowerCase()
-                        : "";
-                    String date = data.containsKey('date')
-                        ? data['date'].toString().toLowerCase()
-                        : "";
-
-                    return station.contains(searchString) ||
-                        flightNumber.contains(searchString) ||
-                        date.contains(searchString);
-                  }).toList();
-                  return ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      var data = results[index].data() as Map<String, dynamic>?;
-
-                      String station =
-                          data != null && data.containsKey('station')
-                              ? data['station']
-                              : "N/A";
-                      String flightNumber =
-                          data != null && data.containsKey('flightNumber')
-                              ? data['flightNumber']
-                              : "N/A";
-                      String date = data != null && data.containsKey('date')
-                          ? data['date']
-                          : "N/A";
-
-                      return ListTile(
-                        title: Text(
-                          "$station - $flightNumber - $date",
-                          style: GoogleFonts.openSans(),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Station: $station"),
-                            Text("Flight Number: $flightNumber"),
-                            Text("Date: $date"),
-                          ],
-                        ),
-                        onTap: () {
-                          // Navigate to ChecklistPopupPage with the selected data
-                          Get.to(() => ChecklistPopupPage(
-                                station: station,
-                                flightNumber: flightNumber,
-                                date: date,
-                              ));
-                        },
-                      );
-                    },
-                  );
+                  if (station.toLowerCase().contains(searchString) ||
+                      flightNumber.toLowerCase().contains(searchString) ||
+                      date.toLowerCase().contains(searchString)) {
+                    return ListTile(
+                      title: Text(
+                        "$station - $flightNumber - $date",
+                        style: GoogleFonts.openSans(),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Station: $station"),
+                          Text("Flight Number: $flightNumber"),
+                          Text("Date: $date"),
+                        ],
+                      ),
+                      onTap: () {
+                        // Navigate to ChecklistPopupPage with the selected data
+                        Get.to(() => ChecklistPopupPage(
+                              checklistId: data.id,
+                              station: station,
+                              flightNumber: flightNumber,
+                              date: date,
+                            ));
+                      },
+                    );
+                  } else {
+                    return Container();
+                  }
                 },
               ),
             ),
@@ -127,16 +120,31 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
+// ignore: must_be_immutable
+
 class ChecklistPopupPage extends StatelessWidget {
+  final int checklistId;
   final String station;
   final String flightNumber;
   final String date;
 
   ChecklistPopupPage({
+    required this.checklistId,
     required this.station,
     required this.flightNumber,
     required this.date,
   });
+
+  final ApiService apiService = ApiService();
+
+  Future<List<ChecklistItem>> fetchChecklistItems() async {
+    try {
+      return await apiService.getChecklistItems(checklistId);
+    } catch (e) {
+      print('Failed to fetch checklist items: $e');
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -150,52 +158,80 @@ class ChecklistPopupPage extends StatelessWidget {
             Get.back();
           },
         ),
-        title: Text('Details',
-            style: GoogleFonts.openSans(
-                fontSize: fontSize, textStyle: TextStyle(color: Colors.white))),
+        title: Text(
+          'Checklist Details',
+          style: GoogleFonts.openSans(
+              fontSize: fontSize, textStyle: TextStyle(color: Colors.white)),
+        ),
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
       ),
-      body: FutureBuilder(
-        future: FirebaseFirestore.instance
-            .collection('inspections')
-            .doc(station)
-            .collection('flights')
-            .doc(flightNumber)
-            .collection('dates')
-            .doc(date)
-            .collection('checklist')
-            .get(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+      body: FutureBuilder<List<ChecklistItem>>(
+        future: fetchChecklistItems(),
+        builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No checklist items found'));
+          } else {
+            List<ChecklistItem> checklistItems = snapshot.data!;
+            return ListView.builder(
+              itemCount: checklistItems.length,
+              itemBuilder: (context, index) {
+                ChecklistItem item = checklistItems[index];
+                return ListTile(
+                  title: Text(item.description),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Yes: ${item.yes}'),
+                      Text('No: ${item.no}'),
+                      if (item.remarkText != null &&
+                          item.remarkText!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text('Remark: ${item.remarkText}'),
+                        ),
+                      if (item.remarkImagePath != null &&
+                          item.remarkImagePath!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Image.network(
+                            item.remarkImagePath!,
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) {
+                                return child;
+                              } else {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            (loadingProgress
+                                                    .expectedTotalBytes ??
+                                                1)
+                                        : null,
+                                  ),
+                                );
+                              }
+                            },
+                            errorBuilder: (BuildContext context, Object error,
+                                StackTrace? stackTrace) {
+                              return Center(
+                                child: Text('Failed to load image'),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            );
           }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No checklist data found."));
-          }
-
-          List<Map<String, dynamic>> checklistItems =
-              snapshot.data!.docs.map((doc) {
-            return doc.data() as Map<String, dynamic>;
-          }).toList();
-
-          return ListView.builder(
-            itemCount: checklistItems.length,
-            itemBuilder: (context, index) {
-              var item = checklistItems[index];
-              return ListTile(
-                title: Text(item['item'], style: GoogleFonts.openSans()),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Yes: ${item['Yes']}"),
-                    Text("No: ${item['No']}"),
-                    Text("Remark: ${item['Remark']}"),
-                  ],
-                ),
-              );
-            },
-          );
         },
       ),
     );

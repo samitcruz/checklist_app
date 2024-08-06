@@ -31,6 +31,18 @@ class ChecklistItem {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'checklistId': checklistId,
+      'description': description,
+      'yes': yes,
+      'no': no,
+      'remarkText': remarkText,
+      'remarkImagePath': remarkImagePath,
+    };
+  }
+
   ChecklistItemCreateDto toCreateDto() {
     return ChecklistItemCreateDto(
       checklistId: checklistId,

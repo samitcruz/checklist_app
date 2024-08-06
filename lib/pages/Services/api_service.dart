@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:safety_check/models/checklist_dto.dart';
 import 'package:safety_check/models/checklist.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/models/checklist_item_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://172.20.45.98:7236/api';
+  static const String _baseUrl = 'https://172.20.45.91:7236/api';
 
   Future<List<Checklist>> getChecklists() async {
     final response = await http.get(Uri.parse('$_baseUrl/Checklist'));
@@ -17,6 +18,22 @@ class ApiService {
       return checklists;
     } else {
       throw Exception('Failed to load checklists');
+    }
+  }
+
+  Future<List<ChecklistItem>> getChecklistItems(int checklistId) async {
+    final response = await http
+        .get(Uri.parse('$_baseUrl/checklistitem/checklist/$checklistId/'));
+    if (response.statusCode == 200) {
+      print('Response body: ${response.body}');
+      List<dynamic> body = jsonDecode(response.body);
+      List<ChecklistItem> checklistItems =
+          body.map((dynamic item) => ChecklistItem.fromJson(item)).toList();
+      return checklistItems;
+    } else {
+      print(
+          'Failed to load checklist items with status code: ${response.statusCode}');
+      throw Exception('Failed to load checklist items');
     }
   }
 
