@@ -40,38 +40,45 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
           checklistId: widget.checklistId,
           description: 'Lines on the ramp clearly visible',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'FOD & fuel and oil leakage signs Inspection Done',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Serviceable Equipment Ready Out of ERA',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Equipment have rubber bumpers at the tip that connects to the aircraft body',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Staff ready with PPE',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Marshialler/ADS ready for guide',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Ramp agent ready with incoming CPM',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
     ];
   }
 
@@ -98,8 +105,6 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                   items[index].remarkText = value;
                 },
                 decoration: InputDecoration(
-                  // labelStyle:
-                  //     TextStyle(color: const Color.fromARGB(2255, 82, 138, 41)),
                   labelText: 'Enter your remark',
                 ),
               ),
@@ -203,7 +208,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
 
   void _saveChecklist() async {
     for (var item in items) {
-      if (!item.yes && !item.no) {
+      if (!item.yes && !item.no && !item.na) {
         Get.snackbar(
           'Incomplete Checklist',
           'Please complete all checklist items before proceeding',
@@ -340,7 +345,10 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.yes = value!;
-                                item.no = !value;
+                                item.no = false;
+                                item.na = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'Yes',
@@ -352,11 +360,30 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.no = value!;
-                                item.yes = !value;
+                                item.yes = false;
+                                item.na = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'No',
                             isNoCheckbox: true,
+                          ),
+                        ),
+                        Expanded(
+                          child: CustomCheckbox(
+                            value: item.na,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                item.na = value!;
+                                item.yes = false;
+                                item.no = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                              });
+                            },
+                            label: 'NA',
+                            isNaCheckbox: true,
                           ),
                         ),
                       ],

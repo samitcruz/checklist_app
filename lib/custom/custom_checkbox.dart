@@ -6,6 +6,7 @@ class CustomCheckbox extends StatelessWidget {
   final ValueChanged<bool?> onChanged;
   final String label;
   final bool isNoCheckbox;
+  final bool isNaCheckbox; // New property for the grey checkbox
   final TextStyle textStyle;
 
   CustomCheckbox({
@@ -14,6 +15,7 @@ class CustomCheckbox extends StatelessWidget {
     required this.label,
     this.textStyle = const TextStyle(),
     this.isNoCheckbox = false,
+    this.isNaCheckbox = false, // Initialize the new property
   });
 
   @override
@@ -28,7 +30,11 @@ class CustomCheckbox extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               border: Border.all(
-                color: value ? (isNoCheckbox ? Colors.red : Colors.green) : Colors.grey,
+                color: value
+                    ? (isNoCheckbox
+                        ? Colors.red
+                        : (isNaCheckbox ? Colors.grey : Colors.green))
+                    : Colors.grey,
                 width: 2.0,
               ),
               color: value ? Colors.transparent : Colors.transparent,
@@ -36,7 +42,9 @@ class CustomCheckbox extends StatelessWidget {
             child: value
                 ? isNoCheckbox
                     ? Icon(Icons.close, size: 20.0, color: Colors.red)
-                    : Icon(Icons.check, size: 20.0, color: Colors.green)
+                    : isNaCheckbox
+                        ? Icon(Icons.remove, size: 20.0, color: Colors.grey)
+                        : Icon(Icons.check, size: 20.0, color: Colors.green)
                 : SizedBox(width: 20.0, height: 20.0),
           ),
         ),

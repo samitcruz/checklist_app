@@ -7,6 +7,7 @@ class ChecklistItemCreateDto {
   final String description;
   final bool yes;
   final bool no;
+  final bool na;
   final String? remarkText;
   final String? remarkImagePath;
 
@@ -15,6 +16,7 @@ class ChecklistItemCreateDto {
     required this.description,
     required this.yes,
     required this.no,
+    required this.na,
     this.remarkText,
     this.remarkImagePath,
   });
@@ -24,6 +26,7 @@ class ChecklistItemCreateDto {
         'description': description,
         'yes': yes,
         'no': no,
+        'na': na,
         'remarkText': remarkText ?? '',
         'remarkImagePath': remarkImagePath ?? '',
       };

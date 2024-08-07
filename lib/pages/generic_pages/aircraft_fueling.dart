@@ -41,24 +41,28 @@ class _AircraftFuelingState extends State<AircraftFueling> {
           description:
               'Fire truck available if fueling is done while passengers are on board. ',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Crew informed when #1 is practiced.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'No movement is allowed between the fire truck and the fueling truck in case of #1 above.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Other vehicle movement restricted around the fueling truck while refueling.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
     ];
   }
 
@@ -188,7 +192,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
 
   void _saveChecklist() async {
     for (var item in items) {
-      if (!item.yes && !item.no) {
+      if (!item.yes && !item.no && !item.na) {
         Get.snackbar(
           'Incomplete Checklist',
           'Please complete all checklist items before proceeding',
@@ -326,6 +330,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                               setState(() {
                                 item.yes = value!;
                                 item.no = !value;
+                                item.na = false;
                               });
                             },
                             label: 'Yes',
@@ -338,10 +343,26 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                               setState(() {
                                 item.no = value!;
                                 item.yes = !value;
+                                item.na = false;
                               });
                             },
                             label: 'No',
                             isNoCheckbox: true,
+                          ),
+                        ),
+                        Expanded(
+                          child: CustomCheckbox(
+                            value: item.na,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                item.na = value!;
+                                item.yes = false;
+                                item.no = false;
+                              });
+                            },
+                            label: 'NA',
+                            isNaCheckbox:
+                                true, // Set the new property for NA state
                           ),
                         ),
                       ],

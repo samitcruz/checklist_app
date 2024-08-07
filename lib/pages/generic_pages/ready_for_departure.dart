@@ -40,48 +40,57 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
           checklistId: widget.checklistId,
           description: 'All equipment are removed.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'All doors are closed.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'No damage to the aircraft witnessed.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Area is cleared off FOD and equipment.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Safety cones and chocks removed.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Pushback assistant (Headset Man) takes over.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Watch blast area clearance.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Wing Walkers available.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'No equipment moves around & behind the aircraft while on push back.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
     ];
   }
 
@@ -211,7 +220,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
 
   void _saveChecklist() async {
     for (var item in items) {
-      if (!item.yes && !item.no) {
+      if (!item.yes && !item.no && !item.na) {
         Get.snackbar(
           'Incomplete Checklist',
           'Please complete all checklist items before proceeding',
@@ -350,6 +359,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
                               setState(() {
                                 item.yes = value!;
                                 item.no = !value;
+                                item.na = false;
                               });
                             },
                             label: 'Yes',
@@ -362,10 +372,26 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
                               setState(() {
                                 item.no = value!;
                                 item.yes = !value;
+                                item.na = false;
                               });
                             },
                             label: 'No',
                             isNoCheckbox: true,
+                          ),
+                        ),
+                        Expanded(
+                          child: CustomCheckbox(
+                            value: item.na,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                item.na = value!;
+                                item.yes = false;
+                                item.no = false;
+                              });
+                            },
+                            label: 'NA',
+                            isNaCheckbox:
+                                true, // Set the new property for NA state
                           ),
                         ),
                       ],

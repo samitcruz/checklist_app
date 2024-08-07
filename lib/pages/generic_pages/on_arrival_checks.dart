@@ -41,57 +41,67 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
           description:
               'No staff/Equipment approached before engine off, anti-collision beacon & aircraft is chocked on and marshaller gives clearance.',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Aircraft parked at right spot',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Chocks placed per standard/aircraft type',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Safety Cones placed per standard',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Check for physical damage on Aircraft before any activity',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Twice brake checks made while equipment approaches aircraft',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Reasonable clearance is left between the aircraft and the equipment positioned',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Stabilizers are set for all equipment positioned to the aircraft ',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
               'Check for any damage on the door area before opening cabin/cargo door',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description: 'Equipment are not operated under the aircraft wing. ',
           yes: false,
-          no: false),
+          no: false,
+          na: false),
     ];
   }
 
@@ -221,7 +231,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
 
   void _saveChecklist() async {
     for (var item in items) {
-      if (!item.yes && !item.no) {
+      if (!item.yes && !item.no && !item.na) {
         Get.snackbar(
           'Incomplete Checklist',
           'Please complete all checklist items before proceeding',
@@ -358,7 +368,10 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.yes = value!;
-                                item.no = !value;
+                                item.no = false;
+                                item.na = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'Yes',
@@ -370,11 +383,30 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.no = value!;
-                                item.yes = !value;
+                                item.yes = false;
+                                item.na = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'No',
                             isNoCheckbox: true,
+                          ),
+                        ),
+                        Expanded(
+                          child: CustomCheckbox(
+                            value: item.na,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                item.na = value!;
+                                item.yes = false;
+                                item.no = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                              });
+                            },
+                            label: 'NA',
+                            isNaCheckbox: true,
                           ),
                         ),
                       ],

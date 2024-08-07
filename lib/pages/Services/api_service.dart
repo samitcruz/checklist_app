@@ -7,7 +7,7 @@ import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/models/checklist_item_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://172.20.45.91:7236/api';
+  static const String _baseUrl = 'https://172.20.45.80:7236/api';
 
   Future<List<Checklist>> getChecklists() async {
     final response = await http.get(Uri.parse('$_baseUrl/Checklist'));
@@ -71,6 +71,7 @@ class ApiService {
     request.fields['Description'] = createDto.description;
     request.fields['Yes'] = createDto.yes.toString();
     request.fields['No'] = createDto.no.toString();
+    request.fields['Na'] = createDto.na.toString();
     if (createDto.remarkText != null) {
       request.fields['RemarkText'] = createDto.remarkText!;
     } else {

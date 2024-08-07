@@ -7,6 +7,7 @@ class ChecklistItem {
   final String description;
   bool yes;
   bool no;
+  bool na;
   String? remarkText;
   String? remarkImagePath;
 
@@ -16,6 +17,7 @@ class ChecklistItem {
     required this.description,
     required this.yes,
     required this.no,
+    required this.na,
     this.remarkText,
     this.remarkImagePath,
   });
@@ -26,6 +28,7 @@ class ChecklistItem {
       description: json['description'],
       yes: json['yes'],
       no: json['no'],
+      na: json['na'],
       remarkText: json['remarkText'],
       remarkImagePath: json['remarkImagePath'],
     );
@@ -38,6 +41,7 @@ class ChecklistItem {
       'description': description,
       'yes': yes,
       'no': no,
+      'na': na,
       'remarkText': remarkText,
       'remarkImagePath': remarkImagePath,
     };
@@ -49,6 +53,7 @@ class ChecklistItem {
       description: description,
       yes: yes,
       no: no,
+      na: na,
       remarkText: remarkText,
       remarkImagePath: remarkImagePath,
     );
