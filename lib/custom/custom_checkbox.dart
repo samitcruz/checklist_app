@@ -33,7 +33,9 @@ class CustomCheckbox extends StatelessWidget {
                 color: value
                     ? (isNoCheckbox
                         ? Colors.red
-                        : (isNaCheckbox ? Colors.grey : Colors.green))
+                        : (isNaCheckbox
+                            ? Color.fromARGB(255, 108, 108, 108)
+                            : Colors.green))
                     : Colors.grey,
                 width: 2.0,
               ),
@@ -43,7 +45,9 @@ class CustomCheckbox extends StatelessWidget {
                 ? isNoCheckbox
                     ? Icon(Icons.close, size: 20.0, color: Colors.red)
                     : isNaCheckbox
-                        ? Icon(Icons.remove, size: 20.0, color: Colors.grey)
+                        ? Icon(Icons.remove,
+                            size: 20.0,
+                            color: Color.fromARGB(255, 108, 108, 108))
                         : Icon(Icons.check, size: 20.0, color: Colors.green)
                 : SizedBox(width: 20.0, height: 20.0),
           ),
