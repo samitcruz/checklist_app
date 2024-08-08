@@ -41,118 +41,121 @@ class _LoginPageState extends State<LoginPage> {
                 Image.asset('images/EtLogo.jpg',
                     height: 200), // Adjust the height as needed
                 SizedBox(height: 50),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade400,
-                        offset: Offset(4.0, 4.0),
-                        blurRadius: 12.0,
-                        spreadRadius: 1.0,
-                      ),
-                      BoxShadow(
-                        color: Colors.grey.shade400,
-                        offset: Offset(-4.0, -4.0),
-                        blurRadius: 12.0,
-                        spreadRadius: 1.0,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Welcome!',
-                        style: GoogleFonts.openSans(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade400,
+                          offset: Offset(4.0, 4.0),
+                          blurRadius: 10.0,
+                          spreadRadius: 1.0,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(12),
+                        BoxShadow(
+                          color: Colors.grey.shade400,
+                          offset: Offset(-4.0, -4.0),
+                          blurRadius: 10.0,
+                          spreadRadius: 1.0,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Welcome!',
+                          style: GoogleFonts.openSans(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: TextField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                icon: Icon(Icons.person),
-                                border: InputBorder.none,
-                                hintText: 'Employee ID',
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20.0),
+                              child: TextField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  icon: Icon(Icons.person),
+                                  border: InputBorder.none,
+                                  hintText: 'Employee ID',
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: TextField(
-                              controller: _passwordController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                icon: Icon(Icons.lock),
-                                border: InputBorder.none,
-                                hintText: 'Password',
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20.0),
+                              child: TextField(
+                                controller: _passwordController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  icon: Icon(Icons.lock),
+                                  border: InputBorder.none,
+                                  hintText: 'Password',
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
+                        SizedBox(height: 10),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              // Handle forgot password
+                            },
+                            child: Text(
+                              'Forgot Password?',
+                              style: GoogleFonts.openSans(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
                           onPressed: () {
-                            // Handle forgot password
+                            Get.to(() => MainPage());
                           },
-                          child: Text(
-                            'Forgot Password?',
-                            style: GoogleFonts.openSans(
-                              color: Colors.grey[600],
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                const Color.fromARGB(255, 82, 138, 41),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 40.0, vertical: 15.0),
+                            child: Text(
+                              'Login',
+                              style: GoogleFonts.openSans(fontSize: 18),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Get.to(() => MainPage());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor:
-                              const Color.fromARGB(255, 82, 138, 41),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40.0, vertical: 15.0),
-                          child: Text(
-                            'Login',
-                            style: GoogleFonts.openSans(fontSize: 18),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 80),

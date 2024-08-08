@@ -88,7 +88,7 @@ class MainPage extends StatelessWidget {
     double fontSize = screenWidth * 0.04;
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(
@@ -170,7 +170,7 @@ class MainPage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 50.0),
                           child: Container(
                             decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: const Color.fromARGB(255, 212, 211, 211),
                                 border: Border.all(color: Colors.white),
                                 borderRadius: BorderRadius.circular(15)),
                             child: TextFormField(
@@ -191,7 +191,7 @@ class MainPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
@@ -199,7 +199,7 @@ class MainPage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 50.0),
                           child: Container(
                             decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: const Color.fromARGB(255, 212, 211, 211),
                                 border: Border.all(color: Colors.white),
                                 borderRadius: BorderRadius.circular(15)),
                             child: TextFormField(
@@ -220,14 +220,14 @@ class MainPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 50.0),
                     child: GestureDetector(
                       onTap: () => _selectDate(context),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: const Color.fromARGB(255, 212, 211, 211),
                             border: Border.all(color: Colors.white),
                             borderRadius: BorderRadius.circular(15)),
                         child: AbsorbPointer(
@@ -248,12 +248,12 @@ class MainPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 50),
+                  SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 200,
+                        width: 250,
                         height: 50,
                         child: ElevatedButton(
                           onPressed: _saveToAPI,
