@@ -105,7 +105,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                           ListTile(
                             leading: Icon(
                               Icons.camera_alt,
-                              color: Colors.black,
+                              color: const Color.fromARGB(255, 82, 138, 41),
                             ),
                             title: Text('Take a Photo'),
                             onTap: () async {
@@ -118,7 +118,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                           ListTile(
                             leading: Icon(
                               Icons.photo_library,
-                              color: Colors.black,
+                              color: const Color.fromARGB(255, 82, 138, 41),
                             ),
                             title: Text('Upload a Photo'),
                             onTap: () async {
