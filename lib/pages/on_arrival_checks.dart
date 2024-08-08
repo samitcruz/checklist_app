@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:safety_check/pages/Services/api_service.dart';
+import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
-import 'package:safety_check/pages/generic_pages/ready_for_departure.dart';
+import 'package:safety_check/pages/aircraft_fueling.dart';
 import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 
-class AircraftFueling extends StatefulWidget {
+class OnArrivalChecks extends StatefulWidget {
   final String stationName;
   final String flightNumber;
   final String date;
   final int checklistId;
 
-  AircraftFueling({
+  OnArrivalChecks({
     required this.stationName,
     required this.flightNumber,
     required this.date,
@@ -24,12 +24,12 @@ class AircraftFueling extends StatefulWidget {
   });
 
   @override
-  _AircraftFuelingState createState() => _AircraftFuelingState();
+  _OnArrivalChecksState createState() => _OnArrivalChecksState();
 }
 
-class _AircraftFuelingState extends State<AircraftFueling> {
+class _OnArrivalChecksState extends State<OnArrivalChecks> {
   List<ChecklistItem> items = [];
-  ApiService apiService = ApiService();
+  final ChecklistController controller = Get.find<ChecklistController>();
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -39,31 +39,71 @@ class _AircraftFuelingState extends State<AircraftFueling> {
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
-              'Fire truck available if fueling is done while passengers are on board. ',
+              'No staff/Equipment approached before engine off, anti-collision beacon & aircraft is chocked on and marshaller gives clearance.',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'Crew informed when #1 is practiced.',
+          description: 'Aircraft parked at right spot',
+          yes: false,
+          no: false,
+          na: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description: 'Chocks placed per standard/aircraft type',
+          yes: false,
+          no: false,
+          na: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description: 'Safety Cones placed per standard',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
-              'No movement is allowed between the fire truck and the fueling truck in case of #1 above.',
+              'Check for physical damage on Aircraft before any activity',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
-              'Other vehicle movement restricted around the fueling truck while refueling.',
+              'Twice brake checks made while equipment approaches aircraft',
+          yes: false,
+          no: false,
+          na: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Reasonable clearance is left between the aircraft and the equipment positioned',
+          yes: false,
+          no: false,
+          na: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Stabilizers are set for all equipment positioned to the aircraft ',
+          yes: false,
+          no: false,
+          na: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description:
+              'Check for any damage on the door area before opening cabin/cargo door',
+          yes: false,
+          no: false,
+          na: false),
+      ChecklistItem(
+          checklistId: widget.checklistId,
+          description: 'Equipment are not operated under the aircraft wing. ',
           yes: false,
           no: false,
           na: false),
     ];
+    controller.addOnArrivalChecksItems(items);
   }
 
   void _showRemarkDialog(int index) async {
@@ -203,26 +243,13 @@ class _AircraftFuelingState extends State<AircraftFueling> {
       }
     }
 
-    try {
-      for (var item in items) {
-        var createDto = item.toCreateDto();
-        await apiService.createChecklistItem(createDto);
-      }
-
-      Get.to(() => ReadyForDeparture(
-            checklistId: widget.checklistId,
-            stationName: widget.stationName,
-            flightNumber: widget.flightNumber,
-            date: widget.date,
-          ));
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'An error occurred while saving the checklist',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+    controller.addOnArrivalChecksItems(items);
+    Get.to(() => AircraftFueling(
+          checklistId: widget.checklistId,
+          stationName: widget.stationName,
+          flightNumber: widget.flightNumber,
+          date: widget.date,
+        ));
   }
 
   @override
@@ -273,7 +300,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
         ],
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
         title: Text(
-          'Aircraft Fueling Operation',
+          'On Arrival/During Operation',
           style: GoogleFonts.openSans(
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
@@ -329,8 +356,10 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.yes = value!;
-                                item.no = !value;
+                                item.no = false;
                                 item.na = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'Yes',
@@ -342,8 +371,10 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.no = value!;
-                                item.yes = !value;
+                                item.yes = false;
                                 item.na = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'No',
@@ -358,11 +389,12 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                                 item.na = value!;
                                 item.yes = false;
                                 item.no = false;
+                                print(
+                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'NA',
-                            isNaCheckbox:
-                                true, // Set the new property for NA state
+                            isNaCheckbox: true,
                           ),
                         ),
                       ],

@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:safety_check/pages/Services/api_service.dart';
+import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
-import 'package:safety_check/pages/generic_pages/aircraft_fueling.dart';
+import 'package:safety_check/pages/on_arrival_checks.dart';
 import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 
-class OnArrivalChecks extends StatefulWidget {
+class PreflightArrivals extends StatefulWidget {
   final String stationName;
   final String flightNumber;
   final String date;
   final int checklistId;
 
-  OnArrivalChecks({
+  PreflightArrivals({
     required this.stationName,
     required this.flightNumber,
     required this.date,
@@ -24,13 +24,13 @@ class OnArrivalChecks extends StatefulWidget {
   });
 
   @override
-  _OnArrivalChecksState createState() => _OnArrivalChecksState();
+  _PreflightArrivalsState createState() => _PreflightArrivalsState();
 }
 
-class _OnArrivalChecksState extends State<OnArrivalChecks> {
+class _PreflightArrivalsState extends State<PreflightArrivals> {
   List<ChecklistItem> items = [];
-  ApiService apiService = ApiService();
   final ImagePicker _picker = ImagePicker();
+  final ChecklistController controller = Get.find<ChecklistController>();
 
   @override
   void initState() {
@@ -38,71 +38,49 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
     items = [
       ChecklistItem(
           checklistId: widget.checklistId,
-          description:
-              'No staff/Equipment approached before engine off, anti-collision beacon & aircraft is chocked on and marshaller gives clearance.',
+          description: 'Lines on the ramp clearly visible',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'Aircraft parked at right spot',
+          description: 'FOD & fuel and oil leakage signs Inspection Done',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'Chocks placed per standard/aircraft type',
-          yes: false,
-          no: false,
-          na: false),
-      ChecklistItem(
-          checklistId: widget.checklistId,
-          description: 'Safety Cones placed per standard',
+          description: 'Serviceable Equipment Ready Out of ERA',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
-              'Check for physical damage on Aircraft before any activity',
+              'Equipment have rubber bumpers at the tip that connects to the aircraft body',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description:
-              'Twice brake checks made while equipment approaches aircraft',
+          description: 'Staff ready with PPE',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description:
-              'Reasonable clearance is left between the aircraft and the equipment positioned',
+          description: 'Marshialler/ADS ready for guide',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description:
-              'Stabilizers are set for all equipment positioned to the aircraft ',
-          yes: false,
-          no: false,
-          na: false),
-      ChecklistItem(
-          checklistId: widget.checklistId,
-          description:
-              'Check for any damage on the door area before opening cabin/cargo door',
-          yes: false,
-          no: false,
-          na: false),
-      ChecklistItem(
-          checklistId: widget.checklistId,
-          description: 'Equipment are not operated under the aircraft wing. ',
+          description: 'Ramp agent ready with incoming CPM',
           yes: false,
           no: false,
           na: false),
     ];
+    controller.addPreflightArrivalsItems(items);
   }
 
   void _showRemarkDialog(int index) async {
@@ -118,7 +96,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
       builder: (BuildContext context) {
         return AlertDialog(
           titleTextStyle: TextStyle(color: Color.fromARGB(255, 82, 138, 41)),
-          title: Text('Add Remark'),
+          title: Text('Add Remark,'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -242,26 +220,13 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
       }
     }
 
-    try {
-      for (var item in items) {
-        var createDto = item.toCreateDto();
-        await apiService.createChecklistItem(createDto);
-      }
-
-      Get.to(() => AircraftFueling(
-            checklistId: widget.checklistId,
-            stationName: widget.stationName,
-            flightNumber: widget.flightNumber,
-            date: widget.date,
-          ));
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'An error occurred while saving the checklist',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+    controller.addPreflightArrivalsItems(items);
+    Get.to(() => OnArrivalChecks(
+          checklistId: widget.checklistId,
+          stationName: widget.stationName,
+          flightNumber: widget.flightNumber,
+          date: widget.date,
+        ));
   }
 
   @override
@@ -312,7 +277,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
         ],
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
         title: Text(
-          'On Arrival/During Operation',
+          'Preflight Arrivals',
           style: GoogleFonts.openSans(
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),

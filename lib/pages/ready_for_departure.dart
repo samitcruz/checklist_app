@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:safety_check/pages/Services/api_service.dart';
+import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/pages/help.dart';
@@ -29,7 +29,7 @@ class ReadyForDeparture extends StatefulWidget {
 
 class _ReadyForDepartureState extends State<ReadyForDeparture> {
   List<ChecklistItem> items = [];
-  ApiService apiService = ApiService();
+  final ChecklistController controller = Get.find<ChecklistController>();
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -92,6 +92,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
           no: false,
           na: false),
     ];
+    controller.addReadyForDepartureItems(items);
   }
 
   void _showRemarkDialog(int index) async {
@@ -219,39 +220,48 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
   }
 
   void _saveChecklist() async {
+    // Check if all checklist items are completed
+    bool isComplete = true;
+
+    for (var item in controller.preflightArrivalsItems) {
+      if (!item.yes && !item.no && !item.na) {
+        isComplete = false;
+        break;
+      }
+    }
+    for (var item in controller.onArrivalChecksItems) {
+      if (!item.yes && !item.no && !item.na) {
+        isComplete = false;
+        break;
+      }
+    }
+    for (var item in controller.aircraftFuelingItems) {
+      if (!item.yes && !item.no && !item.na) {
+        isComplete = false;
+        break;
+      }
+    }
     for (var item in items) {
       if (!item.yes && !item.no && !item.na) {
-        Get.snackbar(
-          'Incomplete Checklist',
-          'Please complete all checklist items before proceeding',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-        return;
+        isComplete = false;
+        break;
       }
     }
 
-    try {
-      for (var item in items) {
-        var createDto = item.toCreateDto();
-        await apiService.createChecklistItem(createDto);
-      }
-
-      Get.to(() => MainPage());
+    if (!isComplete) {
       Get.snackbar(
-        'Success',
-        'You have submitted the checklist',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
+        'Incomplete Checklist',
         'Please complete all checklist items before proceeding',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+      return;
     }
+
+    await controller.saveChecklistItems();
+
+    // Navigate to the next page
+    Get.to(() => MainPage());
   }
 
   @override

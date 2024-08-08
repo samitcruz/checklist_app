@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:safety_check/pages/Services/api_service.dart';
 import 'package:safety_check/models/checklist_dto.dart';
-import 'package:safety_check/pages/generic_pages/preflight_arrivals.dart';
+import 'package:safety_check/pages/preflight_arrivals.dart';
 import 'help.dart';
 import 'notices.dart';
 import 'history.dart';

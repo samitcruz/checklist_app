@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:safety_check/pages/Services/api_service.dart';
+import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
-import 'package:safety_check/pages/generic_pages/on_arrival_checks.dart';
+import 'package:safety_check/pages/ready_for_departure.dart';
 import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 
-class PreflightArrivals extends StatefulWidget {
+class AircraftFueling extends StatefulWidget {
   final String stationName;
   final String flightNumber;
   final String date;
   final int checklistId;
 
-  PreflightArrivals({
+  AircraftFueling({
     required this.stationName,
     required this.flightNumber,
     required this.date,
@@ -24,12 +24,12 @@ class PreflightArrivals extends StatefulWidget {
   });
 
   @override
-  _PreflightArrivalsState createState() => _PreflightArrivalsState();
+  _AircraftFuelingState createState() => _AircraftFuelingState();
 }
 
-class _PreflightArrivalsState extends State<PreflightArrivals> {
+class _AircraftFuelingState extends State<AircraftFueling> {
   List<ChecklistItem> items = [];
-  ApiService apiService = ApiService();
+  final ChecklistController controller = Get.find<ChecklistController>();
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -38,48 +38,33 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
     items = [
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'Lines on the ramp clearly visible',
+          description:
+              'Fire truck available if fueling is done while passengers are on board. ',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'FOD & fuel and oil leakage signs Inspection Done',
-          yes: false,
-          no: false,
-          na: false),
-      ChecklistItem(
-          checklistId: widget.checklistId,
-          description: 'Serviceable Equipment Ready Out of ERA',
+          description: 'Crew informed when #1 is practiced.',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
           description:
-              'Equipment have rubber bumpers at the tip that connects to the aircraft body',
+              'No movement is allowed between the fire truck and the fueling truck in case of #1 above.',
           yes: false,
           no: false,
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'Staff ready with PPE',
-          yes: false,
-          no: false,
-          na: false),
-      ChecklistItem(
-          checklistId: widget.checklistId,
-          description: 'Marshialler/ADS ready for guide',
-          yes: false,
-          no: false,
-          na: false),
-      ChecklistItem(
-          checklistId: widget.checklistId,
-          description: 'Ramp agent ready with incoming CPM',
+          description:
+              'Other vehicle movement restricted around the fueling truck while refueling.',
           yes: false,
           no: false,
           na: false),
     ];
+    controller.addAircraftFuelingItems(items);
   }
 
   void _showRemarkDialog(int index) async {
@@ -95,7 +80,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
       builder: (BuildContext context) {
         return AlertDialog(
           titleTextStyle: TextStyle(color: Color.fromARGB(255, 82, 138, 41)),
-          title: Text('Add Remark,'),
+          title: Text('Add Remark'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -219,26 +204,13 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
       }
     }
 
-    try {
-      for (var item in items) {
-        var createDto = item.toCreateDto();
-        await apiService.createChecklistItem(createDto);
-      }
-
-      Get.to(() => OnArrivalChecks(
-            checklistId: widget.checklistId,
-            stationName: widget.stationName,
-            flightNumber: widget.flightNumber,
-            date: widget.date,
-          ));
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'An error occurred while saving the checklist',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
+    controller.addAircraftFuelingItems(items);
+    Get.to(() => ReadyForDeparture(
+          checklistId: widget.checklistId,
+          stationName: widget.stationName,
+          flightNumber: widget.flightNumber,
+          date: widget.date,
+        ));
   }
 
   @override
@@ -289,7 +261,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
         ],
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
         title: Text(
-          'Preflight Arrivals',
+          'Aircraft Fueling Operation',
           style: GoogleFonts.openSans(
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
@@ -345,10 +317,8 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.yes = value!;
-                                item.no = false;
+                                item.no = !value;
                                 item.na = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'Yes',
@@ -360,10 +330,8 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                             onChanged: (bool? value) {
                               setState(() {
                                 item.no = value!;
-                                item.yes = false;
+                                item.yes = !value;
                                 item.na = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'No',
@@ -378,12 +346,11 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                                 item.na = value!;
                                 item.yes = false;
                                 item.no = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'NA',
-                            isNaCheckbox: true,
+                            isNaCheckbox:
+                                true, // Set the new property for NA state
                           ),
                         ),
                       ],
