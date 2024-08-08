@@ -302,6 +302,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
         title: Text(
           'On Arrival/During Operation',
           style: GoogleFonts.openSans(
+            fontWeight: FontWeight.bold,
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
           ),

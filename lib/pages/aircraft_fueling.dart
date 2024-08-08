@@ -263,6 +263,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
         title: Text(
           'Aircraft Fueling Operation',
           style: GoogleFonts.openSans(
+            fontWeight: FontWeight.bold,
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
           ),

@@ -139,6 +139,7 @@ class MainPage extends StatelessWidget {
         title: Text(
           'Ethiopian Airlines Ground Safety',
           style: GoogleFonts.openSans(
+            fontWeight: FontWeight.bold,
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
           ),
