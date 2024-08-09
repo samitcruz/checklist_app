@@ -7,7 +7,6 @@ import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/pages/on_arrival_checks.dart';
-import 'package:safety_check/pages/help.dart';
 import 'package:safety_check/pages/notices.dart';
 
 class PreflightArrivals extends StatefulWidget {
@@ -249,22 +248,12 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
             iconSize: 30,
             onSelected: (String result) {
               switch (result) {
-                case 'Help':
-                  Get.to(HelpPage());
-                  break;
                 case 'Notices':
-                  Get.to(NoticesPage());
+                  Get.to(() => NoticesPage());
                   break;
               }
             },
             itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'Help',
-                child: Text(
-                  'Help',
-                  style: GoogleFonts.openSans(fontSize: 14),
-                ),
-              ),
               PopupMenuItem<String>(
                 value: 'Notices',
                 child: Text(

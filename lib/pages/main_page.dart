@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:safety_check/Services/api_service.dart';
 import 'package:safety_check/models/checklist_dto.dart';
+import 'package:safety_check/pages/login_page.dart';
 import 'package:safety_check/pages/preflight_arrivals.dart';
-import 'help.dart';
 import 'notices.dart';
 import 'history.dart';
 
@@ -105,22 +105,19 @@ class MainPage extends StatelessWidget {
             iconSize: 30,
             onSelected: (String result) {
               switch (result) {
-                case 'Help':
-                  Get.to(HelpPage());
-                  break;
-                case 'Notices':
-                  Get.to(NoticesPage());
-                  break;
                 case 'History':
                   Get.to(() => HistoryPage());
+                  break;
+
+                case 'Notices':
+                  Get.to(() => NoticesPage());
+                  break;
+                case 'Logout':
+                  Get.to(() => LoginPage());
                   break;
               }
             },
             itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'Help',
-                child: Text('Help', style: GoogleFonts.openSans(fontSize: 14)),
-              ),
               PopupMenuItem<String>(
                 value: 'Notices',
                 child:
@@ -130,6 +127,11 @@ class MainPage extends StatelessWidget {
                 value: 'History',
                 child:
                     Text('History', style: GoogleFonts.openSans(fontSize: 14)),
+              ),
+              PopupMenuItem<String>(
+                value: 'Logout',
+                child:
+                    Text('Log Out', style: GoogleFonts.openSans(fontSize: 14)),
               ),
             ],
           ),
