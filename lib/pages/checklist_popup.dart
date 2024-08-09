@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safety_check/models/checklist_item.dart';
-import 'package:safety_check/pages/Services/api_service.dart';
+import 'package:safety_check/Services/api_service.dart';
 
 class ChecklistPopupPage extends StatelessWidget {
   final int checklistId;

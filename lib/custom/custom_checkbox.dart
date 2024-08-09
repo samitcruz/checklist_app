@@ -6,7 +6,7 @@ class CustomCheckbox extends StatelessWidget {
   final ValueChanged<bool?> onChanged;
   final String label;
   final bool isNoCheckbox;
-  final bool isNaCheckbox; // New property for the grey checkbox
+  final bool isNaCheckbox;
   final TextStyle textStyle;
 
   CustomCheckbox({
@@ -15,7 +15,7 @@ class CustomCheckbox extends StatelessWidget {
     required this.label,
     this.textStyle = const TextStyle(),
     this.isNoCheckbox = false,
-    this.isNaCheckbox = false, // Initialize the new property
+    this.isNaCheckbox = false,
   });
 
   @override

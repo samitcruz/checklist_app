@@ -220,7 +220,6 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
   }
 
   void _saveChecklist() async {
-    // Check if all checklist items are completed
     bool isComplete = true;
 
     for (var item in controller.preflightArrivalsItems) {
@@ -260,7 +259,6 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
 
     await controller.saveChecklistItems();
 
-    // Navigate to the next page
     Get.to(() => MainPage());
   }
 
@@ -401,8 +399,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
                               });
                             },
                             label: 'NA',
-                            isNaCheckbox:
-                                true, // Set the new property for NA state
+                            isNaCheckbox: true,
                           ),
                         ),
                       ],

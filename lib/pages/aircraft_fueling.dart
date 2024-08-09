@@ -350,8 +350,7 @@ class _AircraftFuelingState extends State<AircraftFueling> {
                               });
                             },
                             label: 'NA',
-                            isNaCheckbox:
-                                true, // Set the new property for NA state
+                            isNaCheckbox: true,
                           ),
                         ),
                       ],

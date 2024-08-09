@@ -10,8 +10,7 @@ class NoticesPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: Colors.white), // Set the color of the back button
+            icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               Get.back();
             },
