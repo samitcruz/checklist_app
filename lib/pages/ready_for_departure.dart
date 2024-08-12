@@ -222,7 +222,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
 
   void _saveChecklist() async {
     if (_isSubmitting) return;
-s
+
     setState(() {
       _isSubmitting = true;
     });
