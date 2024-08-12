@@ -80,6 +80,7 @@ class ChecklistPopupPage extends StatelessWidget {
                     children: [
                       Text('Yes: ${item.yes}', style: GoogleFonts.openSans()),
                       Text('No: ${item.no}', style: GoogleFonts.openSans()),
+                      Text('NA: ${item.na}', style: GoogleFonts.openSans()),
                       if (item.remarkText != null &&
                           item.remarkText!.isNotEmpty)
                         Padding(
