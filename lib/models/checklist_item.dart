@@ -9,7 +9,7 @@ class ChecklistItem {
   bool no;
   bool na;
   String? remarkText;
-  String? remarkImagePath;
+  String? remarkImage;
 
   ChecklistItem({
     this.id,
@@ -19,7 +19,7 @@ class ChecklistItem {
     required this.no,
     required this.na,
     this.remarkText,
-    this.remarkImagePath,
+    this.remarkImage,
   });
 
   factory ChecklistItem.fromJson(Map<String, dynamic> json) {
@@ -30,7 +30,7 @@ class ChecklistItem {
       no: json['no'],
       na: json['na'],
       remarkText: json['remarkText'],
-      remarkImagePath: json['remarkImagePath'],
+      remarkImage: json['remarkImage'],
     );
   }
 
@@ -43,7 +43,7 @@ class ChecklistItem {
       'no': no,
       'na': na,
       'remarkText': remarkText,
-      'remarkImagePath': remarkImagePath,
+      'remarkImagePath': remarkImage,
     };
   }
 
@@ -55,7 +55,7 @@ class ChecklistItem {
       no: no,
       na: na,
       remarkText: remarkText,
-      remarkImagePath: remarkImagePath,
+      remarkImagePath: remarkImage,
     );
   }
 }

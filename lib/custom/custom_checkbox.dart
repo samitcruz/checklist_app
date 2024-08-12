@@ -43,12 +43,12 @@ class CustomCheckbox extends StatelessWidget {
             ),
             child: value
                 ? isNoCheckbox
-                    ? Icon(Icons.close, size: 20.0, color: Colors.red)
+                    ? Icon(Icons.close, size: 22.0, color: Colors.red)
                     : isNaCheckbox
                         ? Icon(Icons.remove,
-                            size: 20.0, color: Color.fromARGB(255, 77, 77, 77))
-                        : Icon(Icons.check, size: 20.0, color: Colors.green)
-                : SizedBox(width: 20.0, height: 20.0),
+                            size: 22.0, color: Color.fromARGB(255, 77, 77, 77))
+                        : Icon(Icons.check, size: 22.0, color: Colors.green)
+                : SizedBox(width: 22.0, height: 22.0),
           ),
         ),
         SizedBox(width: 8.0),

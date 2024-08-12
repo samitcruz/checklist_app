@@ -9,8 +9,12 @@ import 'package:safety_check/pages/preflight_arrivals.dart';
 import 'notices.dart';
 import 'history.dart';
 
-// ignore: must_be_immutable
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
   final TextEditingController stationController = TextEditingController();
   final TextEditingController flightNumberController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -18,6 +22,7 @@ class MainPage extends StatelessWidget {
 
   DateTime selectedDate = DateTime.now();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isSubmitting = false; // Track button state
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -38,13 +43,19 @@ class MainPage extends StatelessWidget {
     );
 
     if (picked != null && picked != selectedDate) {
-      selectedDate = picked;
-      dateController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+      setState(() {
+        selectedDate = picked;
+        dateController.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+      });
     }
   }
 
   Future<void> _saveToAPI() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isSubmitting = true;
+      });
+
       try {
         String stationName = stationController.text;
         String flightNumber = flightNumberController.text;
@@ -78,6 +89,10 @@ class MainPage extends StatelessWidget {
           colorText: Colors.white,
         );
         print("Error saving data to the server: $e");
+      } finally {
+        setState(() {
+          _isSubmitting = false;
+        });
       }
     }
   }
@@ -259,14 +274,18 @@ class MainPage extends StatelessWidget {
                         width: 250,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _saveToAPI,
-                          child: Text(
-                            'Checklist',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                            ),
-                          ),
+                          onPressed: _isSubmitting ? null : _saveToAPI,
+                          child: _isSubmitting
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  'Checklist',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromARGB(255, 82, 138, 41),

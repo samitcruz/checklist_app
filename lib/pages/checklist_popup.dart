@@ -1,3 +1,6 @@
+import 'dart:convert'; // For base64 decoding.
+import 'dart:typed_data'; // For Uint8List.
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -86,39 +89,11 @@ class ChecklistPopupPage extends StatelessWidget {
                             style: GoogleFonts.openSans(),
                           ),
                         ),
-                      if (item.remarkImagePath != null &&
-                          item.remarkImagePath!.isNotEmpty)
+                      if (item.remarkImage != null &&
+                          item.remarkImage!.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Image.network(
-                            item.remarkImagePath!,
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) {
-                                return child;
-                              } else {
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            (loadingProgress
-                                                    .expectedTotalBytes ??
-                                                1)
-                                        : null,
-                                  ),
-                                );
-                              }
-                            },
-                            errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stackTrace) {
-                              return Center(
-                                child: Text('Failed to load image',
-                                    style: GoogleFonts.openSans()),
-                              );
-                            },
-                          ),
+                          child: buildImageFromBase64(item.remarkImage!),
                         ),
                     ],
                   ),
@@ -129,5 +104,28 @@ class ChecklistPopupPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget buildImageFromBase64(String base64String) {
+    try {
+      if (base64String.isEmpty) {
+        return Text('No image data', style: GoogleFonts.openSans());
+      }
+
+      Uint8List decodedImage = base64Decode(base64String);
+
+      return Image.memory(
+        decodedImage,
+        height: 100,
+        width: 100,
+        errorBuilder: (context, error, stackTrace) {
+          print('Error displaying image: $error');
+          return Text('Failed to load image', style: GoogleFonts.openSans());
+        },
+      );
+    } catch (e) {
+      print('Error decoding base64 image: $e');
+      return Text('Failed to decode image', style: GoogleFonts.openSans());
+    }
   }
 }

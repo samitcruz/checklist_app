@@ -98,7 +98,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
     TextEditingController remarkController = TextEditingController(
       text: items[index].remarkText ?? '',
     );
-    String? imagePath = items[index].remarkImagePath;
+    String? imagePath = items[index].remarkImage;
     String? imageName =
         imagePath != null ? File(imagePath).uri.pathSegments.last : null;
 
@@ -163,7 +163,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
                     setState(() {
                       imagePath = pickedFile.path;
                       imageName = pickedFile.name;
-                      items[index].remarkImagePath = imagePath;
+                      items[index].remarkImage = imagePath;
                     });
                   }
                 },
@@ -218,7 +218,15 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
     );
   }
 
+  bool _isSubmitting = false;
+
   void _saveChecklist() async {
+    if (_isSubmitting) return;
+s
+    setState(() {
+      _isSubmitting = true;
+    });
+
     bool isComplete = true;
 
     for (var item in controller.preflightArrivalsItems) {
@@ -253,10 +261,17 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+      setState(() {
+        _isSubmitting = false;
+      });
       return;
     }
 
     await controller.saveChecklistItems();
+
+    setState(() {
+      _isSubmitting = false;
+    });
 
     Get.to(() => MainPage());
   }
@@ -314,15 +329,20 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
-                onPressed: _saveChecklist,
+                onPressed: _isSubmitting ? null : _saveChecklist,
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
                   backgroundColor: const Color.fromARGB(255, 82, 138, 41),
                 ),
-                child: Text(
-                  'Submit Checklist',
-                  style: GoogleFonts.openSans(),
-                ),
+                child: _isSubmitting
+                    ? CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            Color.fromARGB(255, 82, 138, 41)),
+                      )
+                    : Text(
+                        'Submit Checklist',
+                        style: GoogleFonts.openSans(),
+                      ),
               ),
             );
           }
@@ -417,11 +437,11 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
                               fontWeight: FontWeight.w600),
                         ),
                       ),
-                    if (item.remarkImagePath != null)
+                    if (item.remarkImage != null)
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Image.file(
-                          File(item.remarkImagePath!),
+                          File(item.remarkImage!),
                           height: 100,
                           width: 100,
                           fit: BoxFit.cover,

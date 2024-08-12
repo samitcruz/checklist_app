@@ -109,7 +109,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
     TextEditingController remarkController = TextEditingController(
       text: items[index].remarkText ?? '',
     );
-    String? imagePath = items[index].remarkImagePath;
+    String? imagePath = items[index].remarkImage;
     String? imageName =
         imagePath != null ? File(imagePath).uri.pathSegments.last : null;
 
@@ -174,7 +174,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                     setState(() {
                       imagePath = pickedFile.path;
                       imageName = pickedFile.name;
-                      items[index].remarkImagePath = imagePath;
+                      items[index].remarkImage = imagePath;
                     });
                   }
                 },
@@ -413,11 +413,11 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                               fontWeight: FontWeight.w600),
                         ),
                       ),
-                    if (item.remarkImagePath != null)
+                    if (item.remarkImage != null)
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
                         child: Image.file(
-                          File(item.remarkImagePath!),
+                          File(item.remarkImage!),
                           height: 100,
                           width: 100,
                           fit: BoxFit.cover,

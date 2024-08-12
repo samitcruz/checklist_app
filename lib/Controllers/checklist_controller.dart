@@ -45,7 +45,7 @@ class ChecklistController extends GetxController {
           no: item.no,
           na: item.na,
           remarkText: item.remarkText,
-          remarkImagePath: item.remarkImagePath,
+          remarkImagePath: item.remarkImage,
         );
 
         await apiService.createChecklistItem(createDto);
