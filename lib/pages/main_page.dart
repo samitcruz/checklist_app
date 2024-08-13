@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,7 +23,15 @@ class _MainPageState extends State<MainPage> {
 
   DateTime selectedDate = DateTime.now();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _isSubmitting = false; // Track button state
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    stationController.dispose();
+    flightNumberController.dispose();
+    dateController.dispose();
+    super.dispose();
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -57,6 +66,20 @@ class _MainPageState extends State<MainPage> {
       });
 
       try {
+        var connectivityResult = await Connectivity().checkConnectivity();
+        if (connectivityResult == ConnectivityResult.none) {
+          Get.snackbar(
+            'No Internet',
+            'Please check your internet connection and try again.',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          setState(() {
+            _isSubmitting = false;
+          });
+          return;
+        }
+
         String stationName = stationController.text;
         String flightNumber = flightNumberController.text;
         String date = dateController.text;
@@ -123,7 +146,6 @@ class _MainPageState extends State<MainPage> {
                 case 'History':
                   Get.to(() => HistoryPage());
                   break;
-
                 case 'Notices':
                   Get.to(() => NoticesPage());
                   break;
@@ -181,62 +203,26 @@ class _MainPageState extends State<MainPage> {
                     height: 200,
                   )),
                   SizedBox(height: 30),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 212, 211, 211),
-                                border: Border.all(color: Colors.white),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: TextFormField(
-                              controller: stationController,
-                              decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 20),
-                                  hintText: 'Station Name',
-                                  border: InputBorder.none),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter the station name';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTextField(
+                    controller: stationController,
+                    hintText: 'Station Name',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the station name';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 50.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 212, 211, 211),
-                                border: Border.all(color: Colors.white),
-                                borderRadius: BorderRadius.circular(15)),
-                            child: TextFormField(
-                              controller: flightNumberController,
-                              decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.only(left: 20),
-                                  hintText: 'Flight Number',
-                                  border: InputBorder.none),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter the flight number';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  _buildTextField(
+                    controller: flightNumberController,
+                    hintText: 'Flight Number',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the flight number';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height: 20),
                   Padding(
@@ -245,16 +231,18 @@ class _MainPageState extends State<MainPage> {
                       onTap: () => _selectDate(context),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 212, 211, 211),
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(15)),
+                          color: const Color.fromARGB(255, 212, 211, 211),
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         child: AbsorbPointer(
                           child: TextFormField(
                             controller: dateController,
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.only(left: 20),
-                                hintText: 'Flight Date',
-                                border: InputBorder.none),
+                              contentPadding: EdgeInsets.only(left: 20),
+                              hintText: 'Flight Date',
+                              border: InputBorder.none,
+                            ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Please select the flight date';
@@ -301,6 +289,32 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 212, 211, 211),
+          border: Border.all(color: Colors.white),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(left: 20),
+            hintText: hintText,
+            border: InputBorder.none,
+          ),
+          validator: validator,
         ),
       ),
     );

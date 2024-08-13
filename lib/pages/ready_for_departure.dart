@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -226,6 +227,19 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
     setState(() {
       _isSubmitting = true;
     });
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      Get.snackbar(
+        'No Internet',
+        'Please check your internet connection and try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      setState(() {
+        _isSubmitting = false;
+      });
+      return;
+    }
 
     bool isComplete = true;
 
