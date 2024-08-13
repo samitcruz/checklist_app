@@ -115,9 +115,21 @@ class ApiService {
   }
 
   Future<void> deleteChecklist(int id) async {
-    final response = await http.delete(Uri.parse('$_baseUrl/Checklist/$id'));
-    if (response.statusCode != 204) {
-      throw Exception('Failed to delete checklist');
+    final Uri url = Uri.parse('$_baseUrl/Checklist/$id');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 204) {
+        print('Checklist deleted successfully');
+      } else {
+        print(
+            'Failed to delete checklist. Status code: ${response.statusCode}');
+        throw Exception('Failed to delete checklist: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error deleting checklist: $e');
+      throw Exception('Error deleting checklist: $e');
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:safety_check/Controllers/checklist_controller.dart';
+import 'package:safety_check/Services/api_service.dart';
 import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/pages/on_arrival_checks.dart';
@@ -206,6 +207,15 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
     );
   }
 
+  Future<void> _deleteChecklist() async {
+    final apiService = ApiService();
+
+    try {
+      await apiService.deleteChecklist(widget.checklistId);
+      Get.back();
+    } catch (e) {}
+  }
+
   void _saveChecklist() async {
     for (var item in items) {
       if (!item.yes && !item.no && !item.na) {
@@ -237,8 +247,9 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Get.back();
+          onPressed: () async {
+            await _deleteChecklist(); // Ensure the deletion is complete before going back
+            // No need to use the result of await _deleteChecklist() here
           },
         ),
         actions: [
