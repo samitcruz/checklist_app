@@ -1,12 +1,13 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:safety_check/Services/api_service.dart';
+import 'package:safety_check/Services/starion_loader.dart';
 import 'package:safety_check/models/checklist_dto.dart';
 import 'package:safety_check/pages/login_page.dart';
 import 'package:safety_check/pages/preflight_arrivals.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'notices.dart';
 import 'history.dart';
 
@@ -16,7 +17,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final TextEditingController stationController = TextEditingController();
   final TextEditingController flightNumberController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final ApiService apiService = ApiService();
@@ -25,9 +25,26 @@ class _MainPageState extends State<MainPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
 
+  String? selectedStation;
+  List<String> stationNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStationNames();
+  }
+
+  Future<void> _loadStationNames() async {
+    try {
+      stationNames = await loadStationNames();
+      setState(() {});
+    } catch (e) {
+      print("Failed to load station names: $e");
+    }
+  }
+
   @override
   void dispose() {
-    stationController.dispose();
     flightNumberController.dispose();
     dateController.dispose();
     super.dispose();
@@ -83,7 +100,7 @@ class _MainPageState extends State<MainPage> {
           return;
         }
 
-        String stationName = stationController.text;
+        String stationName = selectedStation!;
         String flightNumber = flightNumberController.text;
         String date = dateController.text;
 
@@ -121,6 +138,32 @@ class _MainPageState extends State<MainPage> {
         });
       }
     }
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required String? Function(String?)? validator,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 212, 211, 211),
+          border: Border.all(color: Colors.white),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(left: 20),
+            hintText: hintText,
+            border: InputBorder.none,
+          ),
+          validator: validator,
+        ),
+      ),
+    );
   }
 
   @override
@@ -206,16 +249,7 @@ class _MainPageState extends State<MainPage> {
                     height: 200,
                   )),
                   SizedBox(height: 30),
-                  _buildTextField(
-                    controller: stationController,
-                    hintText: 'Station Name',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the station name';
-                      }
-                      return null;
-                    },
-                  ),
+                  _buildAutocompleteField(),
                   SizedBox(height: 20),
                   _buildTextField(
                     controller: flightNumberController,
@@ -297,11 +331,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required String? Function(String?)? validator,
-  }) {
+  Widget _buildAutocompleteField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50.0),
       child: Container(
@@ -310,14 +340,86 @@ class _MainPageState extends State<MainPage> {
           border: Border.all(color: Colors.white),
           borderRadius: BorderRadius.circular(15),
         ),
-        child: TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            contentPadding: EdgeInsets.only(left: 20),
-            hintText: hintText,
-            border: InputBorder.none,
-          ),
-          validator: validator,
+        child: Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+            return stationNames.where((String station) {
+              return station
+                  .toLowerCase()
+                  .contains(textEditingValue.text.toLowerCase());
+            });
+          },
+          onSelected: (String selection) {
+            setState(() {
+              selectedStation = selection;
+            });
+          },
+          fieldViewBuilder: (BuildContext context,
+              TextEditingController textEditingController,
+              FocusNode focusNode,
+              VoidCallback onFieldSubmitted) {
+            return Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: textEditingController,
+                    focusNode: focusNode,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.only(left: 20),
+                      hintText: 'Station Name',
+                      border: InputBorder.none,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select a station name';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.arrow_drop_down),
+                  onPressed: () {},
+                ),
+              ],
+            );
+          },
+          optionsViewBuilder: (BuildContext context,
+              AutocompleteOnSelected<String> onSelected,
+              Iterable<String> options) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Container(
+                  width: 255,
+                  color: Color.fromARGB(255, 212, 211, 211),
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    itemCount: options.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final String option = options.elementAt(index);
+                      return GestureDetector(
+                        onTap: () {
+                          onSelected(option);
+                        },
+                        child: ListTile(
+                          title: Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Text(option),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

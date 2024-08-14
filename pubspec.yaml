@@ -43,6 +43,7 @@ dependencies:
   flutter_launcher_icons:
     ^0.13.1
   connectivity_plus: ^6.0.5
+  csv: ^6.0.0
     #firebase_auth: ^5.1.2
     # firebase_core: ^3.1.1
     # cloud_firestore: ^5.0.2
@@ -76,6 +77,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
+    - assets/Stations.csv
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
