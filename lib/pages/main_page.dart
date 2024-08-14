@@ -34,11 +34,14 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime today = DateTime.now();
+    final DateTime yesterday = today.subtract(Duration(days: 1));
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
+      initialDate: today,
+      firstDate: yesterday,
+      lastDate: today,
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -176,7 +179,7 @@ class _MainPageState extends State<MainPage> {
         centerTitle: false,
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
         title: Text(
-          'Ethiopian Airlines Ground Safety',
+          'ET Ground Safety Checklist',
           style: GoogleFonts.openSans(
             fontWeight: FontWeight.w600,
             fontSize: fontSize,
