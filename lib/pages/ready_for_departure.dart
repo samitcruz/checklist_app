@@ -330,7 +330,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
         title: Text(
           'Ready For Departure',
           style: GoogleFonts.openSans(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
           ),

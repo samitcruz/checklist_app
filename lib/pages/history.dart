@@ -59,7 +59,9 @@ class _HistoryPageState extends State<HistoryPage> {
         title: Text(
           'History',
           style: GoogleFonts.openSans(
-              fontSize: fontSize, textStyle: TextStyle(color: Colors.white)),
+              fontWeight: FontWeight.w600,
+              fontSize: fontSize,
+              textStyle: TextStyle(color: Colors.white)),
         ),
         backgroundColor: const Color.fromARGB(255, 82, 138, 41),
       ),

@@ -178,7 +178,7 @@ class _MainPageState extends State<MainPage> {
         title: Text(
           'Ethiopian Airlines Ground Safety',
           style: GoogleFonts.openSans(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
           ),

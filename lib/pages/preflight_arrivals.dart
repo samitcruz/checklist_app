@@ -279,7 +279,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
         title: Text(
           'Preflight Arrivals',
           style: GoogleFonts.openSans(
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             fontSize: fontSize,
             textStyle: TextStyle(color: Colors.white),
           ),
