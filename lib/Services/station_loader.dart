@@ -4,30 +4,23 @@ import 'package:flutter/services.dart'; // <-- Make sure this import is here
 import 'package:csv/csv.dart';
 
 Future<List<String>> loadStationNames() async {
-  // Get the directory where the app's files are stored
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
 
-  // Define the file path in the document directory
   String filePath = '$appDocPath/Stations.csv';
 
-  // Check if the file exists
   File csvFile = File(filePath);
   if (!csvFile.existsSync()) {
-    // If the file doesn't exist, copy it from assets
     ByteData data = await rootBundle.load('assets/Stations.csv');
     List<int> bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     await File(filePath).writeAsBytes(bytes);
   }
 
-  // Now load the CSV file
   String csvContent = await csvFile.readAsString();
 
-  // Parse the CSV content
   List<List<dynamic>> rows = const CsvToListConverter().convert(csvContent);
 
-  // Extract station names (assuming they are in the first column)
   List<String> stationNames = rows.map((row) => row[0].toString()).toList();
 
   return stationNames;
