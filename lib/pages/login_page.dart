@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 50),
-                Image.asset('images/EtLogo.jpg', height: 200),
+                Image.asset('images/finalLogo2.png', height: 200),
                 SizedBox(height: 50),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),

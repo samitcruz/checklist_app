@@ -7,10 +7,10 @@ import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/models/checklist_item_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://172.20.45.227:7236/api';
+  static const String _baseUrl = 'https://10.0.2.2:7148/api/v1';
 
   Future<List<Checklist>> getChecklists() async {
-    final response = await http.get(Uri.parse('$_baseUrl/Checklist'));
+    final response = await http.get(Uri.parse('$_baseUrl/Checklist/GetAll'));
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Checklist> checklists =
@@ -23,7 +23,7 @@ class ApiService {
 
   Future<List<ChecklistItem>> getChecklistItems(int checklistId) async {
     final response = await http
-        .get(Uri.parse('$_baseUrl/checklistitem/checklist/$checklistId/'));
+        .get(Uri.parse('$_baseUrl/ChecklistItem/by-checklist/$checklistId/'));
     if (response.statusCode == 200) {
       print('Response body: ${response.body}');
       List<dynamic> body = jsonDecode(response.body);
@@ -51,11 +51,11 @@ class ApiService {
       required String stationName,
       required String date}) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl/Checklist'),
+      Uri.parse('$_baseUrl/Checklist/Create'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(checklistDto.toJson()),
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       return responseBody['id'];
     } else {
@@ -64,7 +64,7 @@ class ApiService {
   }
 
   Future<void> createChecklistItem(ChecklistItemCreateDto createDto) async {
-    var uri = Uri.parse('$_baseUrl/checklistitem');
+    var uri = Uri.parse('$_baseUrl/ChecklistItem/Create');
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['ChecklistId'] = createDto.checklistId.toString();
@@ -90,7 +90,7 @@ class ApiService {
     try {
       var response = await request.send();
       var responseBody = await response.stream.bytesToString();
-      if (response.statusCode != 201) {
+      if (response.statusCode != 200) {
         throw Exception(
             'Failed to create checklist item: ${response.statusCode} - $responseBody');
       }
@@ -120,7 +120,7 @@ class ApiService {
     try {
       final response = await http.delete(url);
 
-      if (response.statusCode == 204) {
+      if (response.statusCode == 200) {
         print('Checklist deleted successfully');
       } else {
         print(
