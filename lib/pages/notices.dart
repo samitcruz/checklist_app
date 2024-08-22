@@ -7,7 +7,6 @@ class NoticesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth * 0.045;
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(

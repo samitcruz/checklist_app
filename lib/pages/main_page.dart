@@ -53,7 +53,6 @@ class _MainPageState extends State<MainPage> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime today = DateTime.now();
     final DateTime yesterday = today.subtract(Duration(days: 1));
-
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: today,
