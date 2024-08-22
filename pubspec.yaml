@@ -44,6 +44,7 @@ dependencies:
     ^0.13.1
   connectivity_plus: ^6.0.5
   csv: ^6.0.0
+  flutter_secure_storage: ^9.2.2
     #firebase_auth: ^5.1.2
     # firebase_core: ^3.1.1
     # cloud_firestore: ^5.0.2
