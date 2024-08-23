@@ -32,7 +32,8 @@ class User {
     List<Role> roles = rolesList.map((i) => Role.fromJson(i)).toList();
 
     var organizationsList = json['organizations'] as List;
-    List<Organization> organizations = organizationsList.map((i) => Organization.fromJson(i)).toList();
+    List<Organization> organizations =
+        organizationsList.map((i) => Organization.fromJson(i)).toList();
 
     return User(
       id: json['id'],
@@ -51,7 +52,6 @@ class User {
   }
 }
 
-
 class Role {
   final String roleName;
   final List<Claim> claims;
@@ -67,8 +67,14 @@ class Role {
       claims: claims,
     );
   }
-}
 
+  Map<String, dynamic> toJson() {
+    return {
+      'roleName': roleName,
+      'claims': claims.map((claim) => claim.toJson()).toList(),
+    };
+  }
+}
 
 class Claim {
   final int id;
@@ -83,6 +89,14 @@ class Claim {
       clientId: json['clientId'],
       claim: json['claim'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'clientId': clientId,
+      'claim': claim,
+    };
   }
 }
 
@@ -116,8 +130,19 @@ class Organization {
       email: json['email'],
     );
   }
-}
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'logo': logo,
+      'organizationCode': organizationCode,
+      'database': database,
+      'blob': blob,
+      'email': email,
+    };
+  }
+}
 
 class ClientAuthResponse {
   final String clientId;

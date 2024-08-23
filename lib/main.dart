@@ -2,10 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:safety_check/Controllers/auth_controller.dart';
 import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/pages/login_page.dart';
+import 'package:safety_check/pages/main_page.dart';
 
 Future<void> main() async {
+  Get.put(AuthController());
   Get.put(ChecklistController());
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
@@ -36,7 +39,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const LoginPage(),
+      home: Obx(
+        () {
+          final AuthController controller = Get.find();
+          return controller.isAuthenticated ? MainPage() : LoginPage();
+        },
+      ),
     );
   }
 }

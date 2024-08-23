@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:safety_check/Controllers/auth_controller.dart';
 import 'package:safety_check/models/authentication.dart';
 
 class AuthenticationService {
@@ -11,6 +13,7 @@ class AuthenticationService {
   Future<User?> login(String username, String password) async {
     final url = Uri.parse('$_baseUrl/User/login');
     final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
+
     if (accessToken == null || accessToken.isEmpty) {
       print('Access token is missing or empty');
       return null;
@@ -32,9 +35,26 @@ class AuthenticationService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         User user = User.fromJson(jsonResponse);
-
+        final rolesJson =
+            jsonEncode(user.roles.map((role) => role.toJson()).toList());
+        final organizationsJson =
+            jsonEncode(user.organizations.map((org) => org.toJson()).toList());
         await _storage.write(key: 'idToken', value: user.idToken);
         await _storage.write(key: 'refreshToken', value: user.refreshToken);
+        await _storage.write(key: 'userId', value: user.id.toString());
+        await _storage.write(key: 'username', value: user.username);
+        await _storage.write(key: 'email', value: user.email);
+        await _storage.write(key: 'firstName', value: user.firstName);
+        await _storage.write(key: 'lastName', value: user.lastName);
+        await _storage.write(
+            key: 'isSuperAdmin', value: user.isSuperAdmin.toString());
+        await _storage.write(key: 'isAdmin', value: user.isAdmin.toString());
+        await _storage.write(
+            key: 'expiryDate', value: user.expiryDate.toIso8601String());
+        await _storage.write(key: 'roles', value: rolesJson);
+        await _storage.write(key: 'organizations', value: organizationsJson);
+
+        Get.find<AuthController>().login(user);
 
         return user;
       } else {
@@ -89,14 +109,30 @@ class AuthenticationService {
     return await _storage.read(key: 'idToken');
   }
 
-  Future<String?> getClientToken() async {
-    return await _storage.read(key: 'clientAccessToken');
-  }
-
   Future<void> logout() async {
     await _storage.delete(key: 'idToken');
     await _storage.delete(key: 'refreshToken');
     await _storage.delete(key: 'clientAccessToken');
     await _storage.delete(key: 'clientRefreshToken');
+    await _storage.delete(key: 'refreshToken');
+    await _storage.delete(key: 'username');
+    await _storage.delete(key: 'userId');
+    await _storage.delete(key: 'username');
+    await _storage.delete(key: 'email');
+    await _storage.delete(key: 'firstName');
+    await _storage.delete(key: 'lastName');
+    await _storage.delete(key: 'isSuperAdmin');
+    await _storage.delete(key: 'isAdmin');
+    await _storage.delete(key: 'expiryDate');
+    await _storage.delete(key: 'roles');
+    await _storage.delete(key: 'organizations');
+
+    Get.find<AuthController>().logout();
   }
 }
+
+
+
+  // Future<String?> getClientToken() async {
+  //   return await _storage.read(key: 'clientAccessToken');
+  // }
