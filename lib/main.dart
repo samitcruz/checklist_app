@@ -1,13 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:safety_check/Controllers/checklist_controller.dart';
 import 'package:safety_check/pages/login_page.dart';
 
-void main() {
+Future<void> main() async {
   Get.put(ChecklistController());
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
+  try {
+    await dotenv.load(fileName: "environment_variables.env");
+    print('Environment variables loaded successfully');
+  } catch (e) {
+    print('Error loading .env file: $e');
+  }
   runApp(MyApp());
 }
 
