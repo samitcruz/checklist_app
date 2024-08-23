@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:safety_check/Services/authentication_service.dart';
+import 'package:safety_check/models/authentication.dart';
 import 'package:safety_check/pages/main_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,8 +14,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthenticationService _authService = AuthenticationService();
 
   @override
   void initState() {
@@ -21,6 +24,52 @@ class _LoginPageState extends State<LoginPage> {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: const Color.fromARGB(255, 82, 138, 41),
     ));
+  }
+
+  void _authenticateAndLogin() async {
+    ClientAuthResponse? clientResponse = await _authService.authenticateClient(
+        'ETGroundChecklist', 'gnNzdztOPcCHxQwdiMT94q1C7M8N9zIEODQM0SDkvQs=');
+
+    if (clientResponse != null) {
+      print('Client authenticated successfully');
+
+      User? user = await _authService.login(
+          _usernameController.text.trim(), _passwordController.text.trim());
+
+      if (user != null) {
+        print('User logged in successfully');
+        Get.to(() => MainPage());
+      } else {
+        print('User login failed');
+        Get.snackbar(
+          'Error',
+          'Could not Login. Please Check Your Username and Password',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+      ;
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -84,11 +133,11 @@ class _LoginPageState extends State<LoginPage> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 20.0),
                               child: TextField(
-                                controller: _emailController,
+                                controller: _usernameController,
                                 decoration: InputDecoration(
                                   icon: Icon(Icons.person),
                                   border: InputBorder.none,
-                                  hintText: 'Employee ID',
+                                  hintText: 'Username',
                                 ),
                               ),
                             ),
@@ -131,9 +180,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: 20),
                         ElevatedButton(
-                          onPressed: () {
-                            Get.to(() => MainPage());
-                          },
+                          onPressed:
+                              _authenticateAndLogin, // Use the authentication method here
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.white,
                             backgroundColor:

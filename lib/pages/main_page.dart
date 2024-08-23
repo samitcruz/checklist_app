@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:safety_check/Services/api_service.dart';
+import 'package:safety_check/Services/authentication_service.dart';
 import 'package:safety_check/Services/station_loader.dart';
 import 'package:safety_check/models/checklist_dto.dart';
 import 'package:safety_check/pages/login_page.dart';
@@ -20,6 +21,7 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController flightNumberController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final ApiService apiService = ApiService();
+  final AuthenticationService _authService = AuthenticationService();
 
   DateTime selectedDate = DateTime.now();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -186,7 +188,7 @@ class _MainPageState extends State<MainPage> {
             iconColor: Colors.white,
             color: Colors.white,
             iconSize: 30,
-            onSelected: (String result) {
+            onSelected: (String result) async {
               switch (result) {
                 case 'History':
                   Get.to(() => HistoryPage());
@@ -195,7 +197,8 @@ class _MainPageState extends State<MainPage> {
                   Get.to(() => NoticesPage());
                   break;
                 case 'Logout':
-                  Get.to(() => LoginPage());
+                  await _authService.logout();
+                  Get.offAll(() => LoginPage());
                   break;
               }
             },
