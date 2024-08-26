@@ -56,9 +56,9 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "images/eticon.jpeg"
-  # adaptive_icon_foreground: "images/etgrouncheck.png"
-  # adaptive_icon_background: "#ffffff"
+  image_path: "images/et_app_icon.png"
+  adaptive_icon_foreground: "images/et_app_icon.png"
+  adaptive_icon_background: "#ffffff"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
