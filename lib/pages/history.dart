@@ -24,7 +24,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Future<void> fetchChecklists() async {
     try {
-      List<Checklist> data = await apiService.getChecklists();
+      List<Checklist> data = await apiService.getChecklistsByInspectingStaff();
       setState(() {
         checklistData = data;
       });
@@ -38,15 +38,12 @@ class _HistoryPageState extends State<HistoryPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth * 0.04;
 
-    // Filtered list based on searchString
     List<Checklist> filteredData = checklistData.where((data) {
-      // Convert inspectingStaff to lowercase only if it's not null
       String inspectingStaff = (data.inspectingStaff ?? '').toLowerCase();
       String station = data.stationName.toLowerCase();
       String flightNumber = data.flightNumber.toLowerCase();
       String date = data.date.toLowerCase();
 
-      // Compare the search string with the fields
       return inspectingStaff.contains(searchString) ||
           station.contains(searchString) ||
           flightNumber.contains(searchString) ||

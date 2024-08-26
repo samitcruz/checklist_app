@@ -12,45 +12,6 @@ import 'package:safety_check/models/checklist_item_dto.dart';
 class ApiService {
   static const String _baseUrl = 'https://10.0.2.2:7148/api/v1';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-  Future<List<Checklist>> getChecklists() async {
-    final tenant = dotenv.env['tenant'];
-    final clientClaim = dotenv.env['clientclaim'];
-    final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
-    final idToken = (await _storage.read(key: 'idToken'))?.trim();
-
-    // Get the username from secure storage
-    final authService = AuthenticationService();
-    final userInfo = await authService.getCurrentUserInfo();
-    final username = userInfo['username']?.trim().toLowerCase();
-
-    final response = await http.get(
-      Uri.parse('$_baseUrl/Checklist/GetAll'),
-      headers: {
-        'idToken': '$idToken',
-        'accessToken': '$accessToken',
-        'tenant': tenant ?? '',
-        'clientclaim': clientClaim ?? '',
-      },
-    );
-
-    print('Response body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List<Checklist> checklists =
-          body.map((dynamic item) => Checklist.fromJson(item)).toList();
-
-      // Filter the checklists based on the username
-      List<Checklist> filteredChecklists = checklists.where((checklist) {
-        // Compare the inspectingStaff field with the username
-        return checklist.inspectingStaff?.toLowerCase() == username;
-      }).toList();
-
-      return filteredChecklists;
-    } else {
-      throw Exception('Failed to load checklists');
-    }
-  }
 
   Future<List<ChecklistItem>> getChecklistItems(int checklistId) async {
     final tenant = dotenv.env['tenant'];
@@ -75,6 +36,7 @@ class ApiService {
     } else {
       print(
           'Failed to load checklist items with status code: ${response.statusCode}');
+
       throw Exception('Failed to load checklist items');
     }
   }
@@ -104,6 +66,39 @@ class ApiService {
       return responseBody['id'];
     } else {
       throw Exception('Failed to create checklist');
+    }
+  }
+
+  Future<List<Checklist>> getChecklistsByInspectingStaff() async {
+    final tenant = dotenv.env['tenant'];
+    final clientClaim = dotenv.env['clientclaim'];
+    final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
+    final idToken = (await _storage.read(key: 'idToken'))?.trim();
+
+    final authService = AuthenticationService();
+    final userInfo = await authService.getCurrentUserInfo();
+    final inspectingStaff = userInfo['username']?.trim().toLowerCase();
+
+    final response = await http.get(
+      Uri.parse(
+          '$_baseUrl/Checklist/GetByInspectingStaff?inspectingStaff=$inspectingStaff'),
+      headers: {
+        'idToken': '$idToken',
+        'accessToken': '$accessToken',
+        'tenant': tenant ?? '',
+        'clientclaim': clientClaim ?? '',
+      },
+    );
+
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List<Checklist> checklists =
+          body.map((dynamic item) => Checklist.fromJson(item)).toList();
+      return checklists;
+    } else {
+      throw Exception('Failed to load checklists by inspecting staff');
     }
   }
 
@@ -187,6 +182,47 @@ class ApiService {
     }
   }
 }
+
+ // Future<List<Checklist>> getChecklists() async {
+  //   final tenant = dotenv.env['tenant'];
+  //   final clientClaim = dotenv.env['clientclaim'];
+  //   final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
+  //   final idToken = (await _storage.read(key: 'idToken'))?.trim();
+
+  //   // Get the username from secure storage
+  //   final authService = AuthenticationService();
+  //   final userInfo = await authService.getCurrentUserInfo();
+  //   final username = userInfo['username']?.trim().toLowerCase();
+
+  //   final response = await http.get(
+  //     Uri.parse('$_baseUrl/Checklist/GetAll'),
+  //     headers: {
+  //       'idToken': '$idToken',
+  //       'accessToken': '$accessToken',
+  //       'tenant': tenant ?? '',
+  //       'clientclaim': clientClaim ?? '',
+  //     },
+  //   );
+
+  //   print('Response body: ${response.body}');
+
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> body = jsonDecode(response.body);
+  //     List<Checklist> checklists =
+  //         body.map((dynamic item) => Checklist.fromJson(item)).toList();
+
+  //     // Filter the checklists based on the username
+  //     List<Checklist> filteredChecklists = checklists.where((checklist) {
+  //       // Compare the inspectingStaff field with the username
+  //       return checklist.inspectingStaff?.toLowerCase() == username;
+  //     }).toList();
+
+  //     return filteredChecklists;
+  //   } else {
+  //     throw Exception('Failed to load checklists');
+  //   }
+  // }
+
 
   // Future<Checklist> updateChecklist(int id, ChecklistDto checklistDto) async {
   //   final response = await http.put(
