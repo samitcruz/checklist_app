@@ -40,10 +40,15 @@ class _HistoryPageState extends State<HistoryPage> {
 
     // Filtered list based on searchString
     List<Checklist> filteredData = checklistData.where((data) {
+      // Convert inspectingStaff to lowercase only if it's not null
+      String inspectingStaff = (data.inspectingStaff ?? '').toLowerCase();
       String station = data.stationName.toLowerCase();
       String flightNumber = data.flightNumber.toLowerCase();
       String date = data.date.toLowerCase();
-      return station.contains(searchString) ||
+
+      // Compare the search string with the fields
+      return inspectingStaff.contains(searchString) ||
+          station.contains(searchString) ||
           flightNumber.contains(searchString) ||
           date.contains(searchString);
     }).toList();
@@ -90,6 +95,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 itemCount: filteredData.length,
                 itemBuilder: (context, index) {
                   var data = filteredData[index];
+                  String? inspector = data.inspectingStaff;
                   String station = data.stationName;
                   String flightNumber = data.flightNumber;
                   String date = data.date;
@@ -102,6 +108,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text("Inspection Officer: $inspector"),
                         Text("Station: $station"),
                         Text("Flight Number: $flightNumber"),
                         Text("Date: $date"),

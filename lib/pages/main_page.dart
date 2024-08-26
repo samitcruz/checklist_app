@@ -116,6 +116,7 @@ class _MainPageState extends State<MainPage> {
         String date = dateController.text;
 
         ChecklistDto checklistDto = ChecklistDto(
+          inspectingStaff: username,
           stationName: stationName,
           flightNumber: flightNumber,
           date: date,
@@ -124,6 +125,7 @@ class _MainPageState extends State<MainPage> {
 
         int checklistId = await apiService.createChecklist(
           checklistDto,
+          inspectingStaff: username,
           flightNumber: flightNumber,
           stationName: stationName,
           date: date,
@@ -256,7 +258,7 @@ class _MainPageState extends State<MainPage> {
                   SizedBox(height: 40),
                   Center(
                       child: Image.asset(
-                    'images/EtLogo.jpg',
+                    'images/finalLogo2.png',
                     width: 400,
                     height: 200,
                   )),

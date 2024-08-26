@@ -3,6 +3,7 @@ import 'package:safety_check/models/checklist_item.dart';
 
 class Checklist {
   int id;
+  String? inspectingStaff;
   String stationName;
   String flightNumber;
   String date;
@@ -10,6 +11,7 @@ class Checklist {
 
   Checklist({
     required this.id,
+    required this.inspectingStaff,
     required this.stationName,
     required this.flightNumber,
     required this.date,
@@ -23,6 +25,7 @@ class Checklist {
 
     return Checklist(
       id: json['id'],
+      inspectingStaff: json['inspectingStaff'],
       stationName: json['stationName'],
       flightNumber: json['flightNumber'],
       date: json['date'],

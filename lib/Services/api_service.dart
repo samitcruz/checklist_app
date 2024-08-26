@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:safety_check/Services/authentication_service.dart';
 import 'package:safety_check/models/checklist_dto.dart';
 import 'package:safety_check/models/checklist.dart';
 import 'package:http_parser/http_parser.dart';
@@ -16,6 +17,12 @@ class ApiService {
     final clientClaim = dotenv.env['clientclaim'];
     final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
     final idToken = (await _storage.read(key: 'idToken'))?.trim();
+
+    // Get the username from secure storage
+    final authService = AuthenticationService();
+    final userInfo = await authService.getCurrentUserInfo();
+    final username = userInfo['username']?.trim().toLowerCase();
+
     final response = await http.get(
       Uri.parse('$_baseUrl/Checklist/GetAll'),
       headers: {
@@ -25,12 +32,21 @@ class ApiService {
         'clientclaim': clientClaim ?? '',
       },
     );
+
     print('Response body: ${response.body}');
+
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
       List<Checklist> checklists =
           body.map((dynamic item) => Checklist.fromJson(item)).toList();
-      return checklists;
+
+      // Filter the checklists based on the username
+      List<Checklist> filteredChecklists = checklists.where((checklist) {
+        // Compare the inspectingStaff field with the username
+        return checklist.inspectingStaff?.toLowerCase() == username;
+      }).toList();
+
+      return filteredChecklists;
     } else {
       throw Exception('Failed to load checklists');
     }
@@ -64,7 +80,8 @@ class ApiService {
   }
 
   Future<int> createChecklist(ChecklistDto checklistDto,
-      {required String flightNumber,
+      {required String? inspectingStaff,
+      required String flightNumber,
       required String stationName,
       required String date}) async {
     final tenant = dotenv.env['tenant'];
