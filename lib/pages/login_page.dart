@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthenticationService _authService = AuthenticationService();
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -28,31 +29,57 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _authenticateAndLogin() async {
-    final credentials = await getClientCredentials();
-    ClientAuthResponse? clientResponse = await _authService.authenticateClient(
-      credentials['CLIENT_NAME']!,
-      credentials['CLIENT_SECRET']!,
-    );
+    setState(() {
+      _isSubmitting = true;
+    });
 
-    if (clientResponse != null) {
-      print('Client authenticated successfully');
+    try {
+      final credentials = await getClientCredentials();
+      ClientAuthResponse? clientResponse =
+          await _authService.authenticateClient(
+        credentials['CLIENT_NAME']!,
+        credentials['CLIENT_SECRET']!,
+      );
 
-      User? user = await _authService.login(
-          _usernameController.text.trim(), _passwordController.text.trim());
+      if (clientResponse != null) {
+        print('Client authenticated successfully');
 
-      if (user != null) {
-        print('User logged in successfully');
-        Get.to(() => MainPage());
+        User? user = await _authService.login(
+            _usernameController.text.trim(), _passwordController.text.trim());
+
+        if (user != null) {
+          print('User logged in successfully');
+          Get.to(() => MainPage());
+        } else {
+          print('User login failed');
+          Get.snackbar(
+            'Error',
+            'Could not Login. Please Check Your Username and Password',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
       } else {
-        print('User login failed');
+        print('Client authentication failed');
         Get.snackbar(
           'Error',
-          'Could not Login. Please Check Your Username and Password',
+          'Client authentication failed. Please check your credentials.',
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
       }
-      ;
+    } catch (e) {
+      print('An error occurred: $e');
+      Get.snackbar(
+        'Error',
+        'An unexpected error occurred. Please try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
 
@@ -163,23 +190,30 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed:
-                              _authenticateAndLogin, // Use the authentication method here
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor:
-                                const Color.fromARGB(255, 82, 138, 41),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 40.0, vertical: 15.0),
-                            child: Text(
-                              'Login',
-                              style: GoogleFonts.openSans(fontSize: 18),
+                        Container(
+                          width: 310,
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed:
+                                _isSubmitting ? null : _authenticateAndLogin,
+                            child: _isSubmitting
+                                ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    'Login',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor:
+                                  const Color.fromARGB(255, 82, 138, 41),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ),
                         ),
