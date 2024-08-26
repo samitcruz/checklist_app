@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safety_check/Services/authentication_service.dart';
+import 'package:safety_check/Services/secure_storage.dart';
 import 'package:safety_check/models/authentication.dart';
 import 'package:safety_check/pages/main_page.dart';
 
@@ -28,12 +28,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _authenticateAndLogin() async {
-    String clientName = dotenv.env['CLIENT_NAME'] ?? 'default_client_name';
-    String clientSecret =
-        dotenv.env['CLIENT_SECRET'] ?? 'default_client_secret';
+    final credentials = await getClientCredentials();
     ClientAuthResponse? clientResponse = await _authService.authenticateClient(
-      clientName,
-      clientSecret,
+      credentials['CLIENT_NAME']!,
+      credentials['CLIENT_SECRET']!,
     );
 
     if (clientResponse != null) {

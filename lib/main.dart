@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:safety_check/Controllers/auth_controller.dart';
 import 'package:safety_check/Controllers/checklist_controller.dart';
+import 'package:safety_check/Services/secure_storage.dart';
 import 'package:safety_check/pages/login_page.dart';
 import 'package:safety_check/pages/main_page.dart';
 
@@ -18,6 +19,7 @@ Future<void> main() async {
   } catch (e) {
     print('Error loading .env file: $e');
   }
+  await storeClientCredentials();
   runApp(MyApp());
 }
 

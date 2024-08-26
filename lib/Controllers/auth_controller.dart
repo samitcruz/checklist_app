@@ -94,9 +94,21 @@ class AuthController extends GetxController {
     _user.value = user;
   }
 
-  void logout() {
+  Future<void> logout() async {
     _user.value = null;
-    _storage.deleteAll();
+    await _storage.delete(key: 'idToken');
+    await _storage.delete(key: 'refreshToken');
+    await _storage.delete(key: 'userId');
+    await _storage.delete(key: 'username');
+    await _storage.delete(key: 'email');
+    await _storage.delete(key: 'firstName');
+    await _storage.delete(key: 'lastName');
+    await _storage.delete(key: 'isSuperAdmin');
+    await _storage.delete(key: 'isAdmin');
+    await _storage.delete(key: 'expiryDate');
+    await _storage.delete(key: 'roles');
+    await _storage.delete(key: 'organizations');
+
     Get.offAll(() => LoginPage());
   }
 }
