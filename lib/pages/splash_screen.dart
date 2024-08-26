@@ -39,7 +39,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Widget buildUI() {
     return Center(
-      child: Lottie.asset("assets/animations/ChecklistPlain.json"),
+      child:
+          Lottie.asset("assets/animations/ChecklistPlain.json", reverse: true),
     );
   }
 }
