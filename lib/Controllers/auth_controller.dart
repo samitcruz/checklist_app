@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:safety_check/models/authentication.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:safety_check/pages/login_page.dart';
 
 class AuthController extends GetxController {
   Rxn<User> _user = Rxn<User>();
@@ -15,6 +16,13 @@ class AuthController extends GetxController {
   void onInit() {
     super.onInit();
     _loadUserFromStorage();
+  }
+
+  bool get isTokenExpired {
+    if (_user.value?.expiryDate != null) {
+      return DateTime.now().isAfter(_user.value!.expiryDate);
+    }
+    return true;
   }
 
   void _loadUserFromStorage() async {
@@ -73,10 +81,12 @@ class AuthController extends GetxController {
         organizations: organizations,
         expiryDate: expiryDate,
       );
+      if (isTokenExpired) {
+        logout();
+      }
     } else {
       _user.value = null;
     }
-
     print(isAuthenticated);
   }
 
@@ -86,5 +96,7 @@ class AuthController extends GetxController {
 
   void logout() {
     _user.value = null;
+    _storage.deleteAll();
+    Get.offAll(() => LoginPage());
   }
 }
