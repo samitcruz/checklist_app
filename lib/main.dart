@@ -4,22 +4,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:safety_check/Controllers/auth_controller.dart';
 import 'package:safety_check/Controllers/checklist_controller.dart';
-import 'package:safety_check/Services/secure_storage.dart';
-import 'package:safety_check/pages/login_page.dart';
-import 'package:safety_check/pages/main_page.dart';
+import 'package:safety_check/pages/splash_screen.dart';
 
 Future<void> main() async {
   Get.put(AuthController());
   Get.put(ChecklistController());
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
-  try {
-    await dotenv.load(fileName: "environment_variables.env");
-    print('Environment variables loaded successfully');
-  } catch (e) {
-    print('Error loading .env file: $e');
-  }
-  await storeClientCredentials();
+  await dotenv.load(fileName: "environment_variables.env");
   runApp(MyApp());
 }
 
@@ -41,12 +33,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: Obx(
-        () {
-          final AuthController controller = Get.find();
-          return controller.isAuthenticated ? MainPage() : LoginPage();
-        },
-      ),
+      home: SplashScreen(), // Set SplashScreen as the initial widget
     );
   }
 }
