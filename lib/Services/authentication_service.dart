@@ -112,7 +112,17 @@ class AuthenticationService {
   Future<void> logout() async {
     Get.find<AuthController>().logout();
   }
+
+  Future<Map<String, String?>> getCurrentUserInfo() async {
+    final username = await _storage.read(key: 'username');
+    final email = await _storage.read(key: 'email');
+    return {
+      'username': username,
+      'email': email,
+    };
+  }
 }
+
 
 
 

@@ -21,6 +21,8 @@ class _MainPageState extends State<MainPage> {
   final TextEditingController dateController = TextEditingController();
   final ApiService apiService = ApiService();
   final AuthenticationService _authService = AuthenticationService();
+  String? username;
+  String? email;
 
   DateTime selectedDate = DateTime.now();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -33,6 +35,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _loadStationNames();
+    _loadUserInfo();
   }
 
   Future<void> _loadStationNames() async {
@@ -42,6 +45,14 @@ class _MainPageState extends State<MainPage> {
     } catch (e) {
       print("Failed to load station names: $e");
     }
+  }
+
+  Future<void> _loadUserInfo() async {
+    final userInfo = await _authService.getCurrentUserInfo();
+    setState(() {
+      username = userInfo['username']!;
+      email = userInfo['email']!;
+    });
   }
 
   @override
@@ -176,11 +187,11 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(
-            Icons.home,
+            Icons.account_circle,
             color: Colors.white,
-            size: 30,
+            size: 40,
           ),
-          onPressed: () {},
+          onPressed: _showUserDetails,
         ),
         actions: [
           PopupMenuButton<String>(
@@ -423,6 +434,57 @@ class _MainPageState extends State<MainPage> {
           },
         ),
       ),
+    );
+  }
+
+  void _showUserDetails() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'User Details',
+            style: TextStyle(color: const Color.fromARGB(255, 82, 138, 41)),
+          ),
+          content: Container(
+            constraints: BoxConstraints(
+              maxWidth: 300,
+            ),
+            child: Wrap(
+              alignment: WrapAlignment.start,
+              spacing: 16.0,
+              runSpacing: 8.0,
+              children: [
+                Row(
+                  children: [
+                    Text('Username: ',
+                        style: GoogleFonts.openSans(
+                            fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(username ?? 'N/A'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text('Email: ',
+                        style: GoogleFonts.openSans(
+                            fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text(email ?? 'N/A'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Close',
+                style: TextStyle(color: const Color.fromARGB(255, 82, 138, 41)),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
