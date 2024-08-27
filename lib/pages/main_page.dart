@@ -164,7 +164,7 @@ class _MainPageState extends State<MainPage> {
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 212, 211, 211),
           border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: TextFormField(
           controller: controller,
@@ -260,9 +260,9 @@ class _MainPageState extends State<MainPage> {
                       child: Image.asset(
                     'images/finalLogo2.png',
                     width: 400,
-                    height: 200,
+                    height: 250,
                   )),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   _buildAutocompleteField(),
                   SizedBox(height: 20),
                   _buildTextField(
@@ -284,7 +284,7 @@ class _MainPageState extends State<MainPage> {
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 212, 211, 211),
                           border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: AbsorbPointer(
                           child: TextFormField(
@@ -310,7 +310,7 @@ class _MainPageState extends State<MainPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 250,
+                        width: 260,
                         height: 50,
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : _saveToAPI,
@@ -329,7 +329,7 @@ class _MainPageState extends State<MainPage> {
                             backgroundColor:
                                 const Color.fromARGB(255, 82, 138, 41),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
                         ),
@@ -352,7 +352,7 @@ class _MainPageState extends State<MainPage> {
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 212, 211, 211),
           border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(5),
         ),
         child: Autocomplete<String>(
           optionsBuilder: (TextEditingValue textEditingValue) {
@@ -407,10 +407,10 @@ class _MainPageState extends State<MainPage> {
               alignment: Alignment.topLeft,
               child: Material(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 child: Container(
-                  width: 255,
+                  width: 258,
                   color: Color.fromARGB(255, 212, 211, 211),
                   child: ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 8.0),

@@ -98,8 +98,12 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: 50),
-                Image.asset('images/finalLogo2.png', height: 200),
-                SizedBox(height: 50),
+                Image.asset(
+                  'images/finalLogo2.png',
+                  height: 250,
+                  width: 500,
+                ),
+                SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
@@ -180,7 +184,42 @@ class _LoginPageState extends State<LoginPage> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.snackbar(
+                                '',
+                                '',
+                                backgroundColor:
+                                    Color.fromARGB(255, 217, 196, 0)
+                                        .withOpacity(0.8),
+                                colorText: Colors.white,
+                                titleText: Text(
+                                  'Support',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                messageText: Text(
+                                  'Contact support team',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              overlayColor:
+                                  WidgetStateProperty.resolveWith<Color?>(
+                                (Set<WidgetState> states) {
+                                  if (states.contains(WidgetState.pressed))
+                                    return const Color.fromARGB(
+                                            255, 76, 170, 80)
+                                        .withOpacity(0.3);
+                                  return null;
+                                },
+                              ),
+                            ),
                             child: Text(
                               'Forgot Password?',
                               style: GoogleFonts.openSans(
@@ -189,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         Container(
                           width: 310,
                           height: 50,
@@ -221,8 +260,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 80),
-                Image.asset('images/Etfoot.jpg'),
+                SizedBox(height: 10),
+                Image.asset(
+                  'images/sash.png',
+                  height: 200,
+                  width: MediaQuery.of(context).size.width,
+                ),
               ],
             ),
           ),
