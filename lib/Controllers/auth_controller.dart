@@ -38,7 +38,6 @@ class AuthController extends GetxController {
     final expiryDateStr = await _storage.read(key: 'expiryDate');
     final rolesJson = await _storage.read(key: 'roles');
     final organizationsJson = await _storage.read(key: 'organizations');
-
     final int? userId = userIdStr != null ? int.tryParse(userIdStr) : null;
     final bool isSuperAdmin = isSuperAdminStr == 'true';
     final bool isAdmin = isAdminStr == 'true';

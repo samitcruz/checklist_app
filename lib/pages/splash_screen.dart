@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: buildUI(),
     );
   }
-
+  
   Widget buildUI() {
     return Center(
       child:
