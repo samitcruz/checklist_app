@@ -238,185 +238,195 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
         ));
   }
 
+  Future<void> _handlePop() async {
+    await _deleteChecklist();
+    // No need to return a result here
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth * 0.04;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () async {
-            await _deleteChecklist(); // Ensure the deletion is complete before going back
-            // No need to use the result of await _deleteChecklist() here
-          },
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            iconColor: Colors.white,
-            color: Colors.white,
-            iconSize: 30,
-            onSelected: (String result) {
-              switch (result) {
-                case 'Notices':
-                  Get.to(() => NoticesPage());
-                  break;
-              }
+    return PopScope(
+      onPopInvoked: (result) async {
+        await _handlePop(); // Indicate that the pop should be allowed
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () async {
+              await _deleteChecklist();
             },
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'Notices',
-                child: Text(
-                  'Notices',
-                  style: GoogleFonts.openSans(fontSize: 14),
-                ),
-              ),
-            ],
           ),
-        ],
-        backgroundColor: const Color.fromARGB(255, 82, 138, 41),
-        title: Text(
-          'Preflight Arrivals',
-          style: GoogleFonts.openSans(
-            fontWeight: FontWeight.w600,
-            fontSize: fontSize,
-            textStyle: TextStyle(color: Colors.white),
+          actions: [
+            PopupMenuButton<String>(
+              iconColor: Colors.white,
+              color: Colors.white,
+              iconSize: 30,
+              onSelected: (String result) {
+                switch (result) {
+                  case 'Notices':
+                    Get.to(() => NoticesPage());
+                    break;
+                }
+              },
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  value: 'Notices',
+                  child: Text(
+                    'Notices',
+                    style: GoogleFonts.openSans(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          backgroundColor: const Color.fromARGB(255, 82, 138, 41),
+          title: Text(
+            'Preflight Arrivals',
+            style: GoogleFonts.openSans(
+              fontWeight: FontWeight.w600,
+              fontSize: fontSize,
+              textStyle: TextStyle(color: Colors.white),
+            ),
           ),
         ),
-      ),
-      body: ListView.builder(
-        itemCount: items.length + 1,
-        itemBuilder: (context, index) {
-          if (index == items.length) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _saveChecklist,
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 82, 138, 41),
+        body: ListView.builder(
+          itemCount: items.length + 1,
+          itemBuilder: (context, index) {
+            if (index == items.length) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: _saveChecklist,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color.fromARGB(255, 82, 138, 41),
+                  ),
+                  child: Text(
+                    'Next Section',
+                    style: GoogleFonts.openSans(),
+                  ),
                 ),
-                child: Text(
-                  'Next Section',
-                  style: GoogleFonts.openSans(),
+              );
+            }
+
+            ChecklistItem item = items[index];
+            return ConstrainedBox(
+              constraints: BoxConstraints(minHeight: 150),
+              child: Card(
+                elevation: 4,
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${index + 1}. ${item.description}',
+                        style: GoogleFonts.openSans(fontSize: fontSize),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 30,
+                          ),
+                          Expanded(
+                            child: CustomCheckbox(
+                              value: item.yes,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  item.yes = value!;
+                                  item.no = false;
+                                  item.na = false;
+                                  print(
+                                      'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                                });
+                              },
+                              label: 'Yes',
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomCheckbox(
+                              value: item.no,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  item.no = value!;
+                                  item.yes = false;
+                                  item.na = false;
+                                  print(
+                                      'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                                });
+                              },
+                              label: 'No',
+                              isNoCheckbox: true,
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomCheckbox(
+                              value: item.na,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  item.na = value!;
+                                  item.yes = false;
+                                  item.no = false;
+                                  print(
+                                      'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                                });
+                              },
+                              label: 'NA',
+                              isNaCheckbox: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => _showRemarkDialog(index),
+                          icon: Icon(Icons.add_comment,
+                              color: const Color.fromARGB(255, 82, 138, 41)),
+                          label: Text('Add Remark',
+                              style: GoogleFonts.openSans(
+                                textStyle: TextStyle(
+                                    color:
+                                        const Color.fromARGB(255, 82, 138, 41)),
+                              )),
+                        ),
+                      ),
+                      if (item.remarkText != null &&
+                          item.remarkText!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            'Remark: ${item.remarkText}',
+                            style: GoogleFonts.openSans(
+                                fontSize: fontSize * 0.8,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      if (item.remarkImage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Image.file(
+                            File(item.remarkImage!),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             );
-          }
-
-          ChecklistItem item = items[index];
-          return ConstrainedBox(
-            constraints: BoxConstraints(minHeight: 150),
-            child: Card(
-              elevation: 4,
-              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${index + 1}. ${item.description}',
-                      style: GoogleFonts.openSans(fontSize: fontSize),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 30,
-                        ),
-                        Expanded(
-                          child: CustomCheckbox(
-                            value: item.yes,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                item.yes = value!;
-                                item.no = false;
-                                item.na = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
-                              });
-                            },
-                            label: 'Yes',
-                          ),
-                        ),
-                        Expanded(
-                          child: CustomCheckbox(
-                            value: item.no,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                item.no = value!;
-                                item.yes = false;
-                                item.na = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
-                              });
-                            },
-                            label: 'No',
-                            isNoCheckbox: true,
-                          ),
-                        ),
-                        Expanded(
-                          child: CustomCheckbox(
-                            value: item.na,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                item.na = value!;
-                                item.yes = false;
-                                item.no = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
-                              });
-                            },
-                            label: 'NA',
-                            isNaCheckbox: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton.icon(
-                        onPressed: () => _showRemarkDialog(index),
-                        icon: Icon(Icons.add_comment,
-                            color: const Color.fromARGB(255, 82, 138, 41)),
-                        label: Text('Add Remark',
-                            style: GoogleFonts.openSans(
-                              textStyle: TextStyle(
-                                  color:
-                                      const Color.fromARGB(255, 82, 138, 41)),
-                            )),
-                      ),
-                    ),
-                    if (item.remarkText != null && item.remarkText!.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          'Remark: ${item.remarkText}',
-                          style: GoogleFonts.openSans(
-                              fontSize: fontSize * 0.8,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    if (item.remarkImage != null)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Image.file(
-                          File(item.remarkImage!),
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
