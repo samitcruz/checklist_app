@@ -240,7 +240,6 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
 
   Future<void> _handlePop() async {
     await _deleteChecklist();
-    // No need to return a result here
   }
 
   @override
@@ -249,15 +248,14 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
     double fontSize = screenWidth * 0.04;
 
     return PopScope(
-      onPopInvoked: (result) async {
-        await _handlePop(); // Indicate that the pop should be allowed
-      },
+      canPop: false,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () async {
               await _deleteChecklist();
+              Get.back();
             },
           ),
           actions: [
