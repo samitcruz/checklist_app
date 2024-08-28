@@ -7,7 +7,7 @@ class Checklist {
   String stationName;
   String flightNumber;
   String date;
-  List<ChecklistItem> items;
+  List<ChecklistItem>? items;
 
   Checklist({
     required this.id,
@@ -15,13 +15,14 @@ class Checklist {
     required this.stationName,
     required this.flightNumber,
     required this.date,
-    required this.items,
+    this.items,
   });
 
   factory Checklist.fromJson(Map<String, dynamic> json) {
-    var itemsList = json['items'] as List;
-    List<ChecklistItem> items =
-        itemsList.map((i) => ChecklistItem.fromJson(i)).toList();
+    var itemsList = json['items'] as List?;
+    List<ChecklistItem> items = itemsList != null
+        ? itemsList.map((i) => ChecklistItem.fromJson(i)).toList()
+        : [];
 
     return Checklist(
       id: json['id'],
