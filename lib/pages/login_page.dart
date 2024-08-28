@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
 
         if (user != null) {
           print('User logged in successfully');
-          Get.to(() => MainPage());
+          Get.offAll(() => MainPage());
         } else {
           print('User login failed');
           Get.snackbar(

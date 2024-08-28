@@ -287,7 +287,7 @@ class _ReadyForDepartureState extends State<ReadyForDeparture> {
       _isSubmitting = false;
     });
 
-    Get.to(() => MainPage());
+    Get.offAll(() => MainPage());
   }
 
   @override
