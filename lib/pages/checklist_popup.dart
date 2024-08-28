@@ -35,6 +35,7 @@ class ChecklistPopupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double fontSize = screenWidth * 0.04;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -56,7 +57,12 @@ class ChecklistPopupPage extends StatelessWidget {
         future: fetchChecklistItems(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    Color.fromARGB(255, 82, 138, 41)), // Change color here
+              ),
+            );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
