@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final AuthenticationService _authService = AuthenticationService();
   bool _isSubmitting = false;
+  bool _obscurePassword = true; 
 
   @override
   void initState() {
@@ -90,18 +91,18 @@ class _LoginPageState extends State<LoginPage> {
         statusBarColor: const Color.fromARGB(255, 82, 138, 41),
       ),
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: Colors.white,
         extendBodyBehindAppBar: true,
-        body: Center(
-          child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: 50),
                 Image.asset(
                   'images/finalLogo2.png',
                   height: 250,
-                  width: 500,
+                  width: MediaQuery.of(context).size.width * 0.8,
                 ),
                 SizedBox(height: 20),
                 Padding(
@@ -127,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           'Welcome!',
@@ -170,11 +171,23 @@ class _LoginPageState extends State<LoginPage> {
                               padding: const EdgeInsets.only(left: 20.0),
                               child: TextField(
                                 controller: _passwordController,
-                                obscureText: true,
+                                obscureText: _obscurePassword,
                                 decoration: InputDecoration(
                                   icon: Icon(Icons.lock),
                                   border: InputBorder.none,
                                   hintText: 'Password',
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
@@ -260,10 +273,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 0),
                 Image.asset(
                   'images/sash.png',
-                  height: 200,
+                  height: 100,
                   width: MediaQuery.of(context).size.width,
                 ),
               ],

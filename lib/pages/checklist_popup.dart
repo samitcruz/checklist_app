@@ -4,6 +4,7 @@ import 'dart:typed_data'; // For Uint8List.
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:safety_check/custom/custom_checkbox.dart';
 import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/Services/api_service.dart';
 
@@ -60,7 +61,7 @@ class ChecklistPopupPage extends StatelessWidget {
             return Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
-                    Color.fromARGB(255, 82, 138, 41)), // Change color here
+                    Color.fromARGB(255, 82, 138, 41)),
               ),
             );
           } else if (snapshot.hasError) {
@@ -86,9 +87,42 @@ class ChecklistPopupPage extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Yes: ${item.yes}', style: GoogleFonts.openSans()),
-                      Text('No: ${item.no}', style: GoogleFonts.openSans()),
-                      Text('NA: ${item.na}', style: GoogleFonts.openSans()),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 30,
+                          ),
+                          Expanded(
+                            child: CustomCheckbox(
+                              value: item.yes,
+                              onChanged: (_) {},
+                              label: 'Yes',
+                              textStyle: GoogleFonts.openSans(),
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomCheckbox(
+                              value: item.no,
+                              onChanged: (_) {},
+                              label: 'No',
+                              isNoCheckbox: true,
+                              textStyle: GoogleFonts.openSans(),
+                            ),
+                          ),
+                          Expanded(
+                            child: CustomCheckbox(
+                              value: item.na,
+                              onChanged: (_) {},
+                              label: 'NA',
+                              isNaCheckbox: true,
+                              textStyle: GoogleFonts.openSans(),
+                            ),
+                          ),
+                        ],
+                      ),
                       if (item.remarkText != null &&
                           item.remarkText!.isNotEmpty)
                         Padding(
