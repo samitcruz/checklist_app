@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:safety_check/Controllers/auth_controller.dart';
 import 'package:safety_check/Controllers/checklist_controller.dart';
+import 'package:safety_check/Services/secure_storage.dart';
 import 'package:safety_check/pages/splash_screen.dart';
 
 Future<void> main() async {
@@ -12,6 +13,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
   await dotenv.load(fileName: "environment_variables.env");
+  await storeClientCredentials();
   runApp(MyApp());
 }
 
