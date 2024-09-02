@@ -44,7 +44,8 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'FOD & fuel and oil leakage signs Inspection Done',
+          description:
+              'FOD(Foreign Object Debris) & fuel and oil leakage signs Inspection Done',
           yes: false,
           no: false,
           na: false),
@@ -69,7 +70,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
           na: false),
       ChecklistItem(
           checklistId: widget.checklistId,
-          description: 'Marshialler/ADS ready for guide',
+          description: 'Marshaller/ADS ready for guide',
           yes: false,
           no: false,
           na: false),

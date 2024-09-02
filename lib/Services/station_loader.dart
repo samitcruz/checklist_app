@@ -21,7 +21,7 @@ Future<List<String>> loadStationNames() async {
 
   List<List<dynamic>> rows = const CsvToListConverter().convert(csvContent);
 
-  List<String> stationNames = rows.map((row) => row[0].toString()).toList();
+  List<String> stationNames = rows.map((row) => row[1].toString()).toList();
 
   return stationNames;
 }
