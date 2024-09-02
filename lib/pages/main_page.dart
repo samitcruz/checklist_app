@@ -255,14 +255,13 @@ class _MainPageState extends State<MainPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 40),
                   Center(
                       child: Image.asset(
                     'images/finalLogo2.png',
                     width: 400,
                     height: 250,
                   )),
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   _buildAutocompleteField(),
                   SizedBox(height: 20),
                   _buildTextField(
@@ -410,7 +409,7 @@ class _MainPageState extends State<MainPage> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Container(
-                  width: 258,
+                  width: 238,
                   color: Color.fromARGB(255, 212, 211, 211),
                   child: ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 8.0),
