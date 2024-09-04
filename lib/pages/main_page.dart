@@ -309,7 +309,7 @@ class _MainPageState extends State<MainPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 260,
+                        width: 242,
                         height: 50,
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : _saveToAPI,
