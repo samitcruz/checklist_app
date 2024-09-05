@@ -239,9 +239,6 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
         ));
   }
 
-  // Future<void> _handlePop() async {
-  //   await _deleteChecklist();
-  // }
 
   @override
   Widget build(BuildContext context) {
