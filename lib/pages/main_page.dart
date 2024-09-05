@@ -158,9 +158,13 @@ class _MainPageState extends State<MainPage> {
     required String hintText,
     required String? Function(String?)? validator,
   }) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double fieldWidth = screenWidth * 0.8;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50.0),
       child: Container(
+        width: fieldWidth,
         decoration: BoxDecoration(
           color: const Color.fromARGB(255, 212, 211, 211),
           border: Border.all(color: Colors.white),
@@ -309,7 +313,7 @@ class _MainPageState extends State<MainPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        width: 242,
+                        width: MediaQuery.of(context).size.width * 0.625,
                         height: 50,
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : _saveToAPI,
@@ -334,7 +338,7 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
@@ -347,93 +351,102 @@ class _MainPageState extends State<MainPage> {
   Widget _buildAutocompleteField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 212, 211, 211),
-          border: Border.all(color: Colors.white),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Autocomplete<String>(
-          optionsBuilder: (TextEditingValue textEditingValue) {
-            if (textEditingValue.text.isEmpty) {
-              return const Iterable<String>.empty();
-            }
-            return stationNames.where((String station) {
-              return station
-                  .toLowerCase()
-                  .contains(textEditingValue.text.toLowerCase());
-            });
-          },
-          onSelected: (String selection) {
-            setState(() {
-              selectedStation = selection;
-            });
-          },
-          fieldViewBuilder: (BuildContext context,
-              TextEditingController textEditingController,
-              FocusNode focusNode,
-              VoidCallback onFieldSubmitted) {
-            return Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: textEditingController,
-                    focusNode: focusNode,
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.only(left: 20),
-                      hintText: 'Station Name',
-                      border: InputBorder.none,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please select a station name';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.arrow_drop_down),
-                  onPressed: () {},
-                ),
-              ],
-            );
-          },
-          optionsViewBuilder: (BuildContext context,
-              AutocompleteOnSelected<String> onSelected,
-              Iterable<String> options) {
-            return Align(
-              alignment: Alignment.topLeft,
-              child: Material(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Container(
-                  width: 238,
-                  color: Color.fromARGB(255, 212, 211, 211),
-                  child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    itemCount: options.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final String option = options.elementAt(index);
-                      return GestureDetector(
-                        onTap: () {
-                          onSelected(option);
-                        },
-                        child: ListTile(
-                          title: Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Text(option),
-                          ),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          double screenWidth = MediaQuery.of(context).size.width;
+          double fieldWidth = screenWidth * 0.8;
+          double fieldtrip = screenWidth * 0.625;
+
+          return Container(
+            width: fieldWidth,
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 212, 211, 211),
+              border: Border.all(color: Colors.white),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Autocomplete<String>(
+              optionsBuilder: (TextEditingValue textEditingValue) {
+                if (textEditingValue.text.isEmpty) {
+                  return const Iterable<String>.empty();
+                }
+                return stationNames.where((String station) {
+                  return station
+                      .toLowerCase()
+                      .contains(textEditingValue.text.toLowerCase());
+                });
+              },
+              onSelected: (String selection) {
+                setState(() {
+                  selectedStation = selection;
+                });
+              },
+              fieldViewBuilder: (BuildContext context,
+                  TextEditingController textEditingController,
+                  FocusNode focusNode,
+                  VoidCallback onFieldSubmitted) {
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        controller: textEditingController,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(left: 20),
+                          hintText: 'Station Name',
+                          border: InputBorder.none,
                         ),
-                      );
-                    },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a station name';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.arrow_drop_down),
+                      onPressed: () {},
+                    ),
+                  ],
+                );
+              },
+              optionsViewBuilder: (BuildContext context,
+                  AutocompleteOnSelected<String> onSelected,
+                  Iterable<String> options) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Container(
+                      width: fieldtrip,
+                      color: Color.fromARGB(255, 212, 211, 211),
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(horizontal: 8.0),
+                        itemCount: options.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final String option = options.elementAt(index);
+                          return GestureDetector(
+                            onTap: () {
+                              onSelected(option);
+                            },
+                            child: ListTile(
+                              title: Padding(
+                                padding: const EdgeInsets.only(left: 10.0),
+                                child: Text(option),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
-          },
-        ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }
