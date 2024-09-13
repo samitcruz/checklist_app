@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final AuthenticationService _authService = AuthenticationService();
   bool _isSubmitting = false;
-  bool _obscurePassword = true; 
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -99,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: 20),
                 Image.asset(
                   'images/finalLogo2.png',
                   height: 250,
