@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:safety_check/Services/authentication_service.dart';
@@ -14,12 +15,72 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
+class SecureStorage {
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
+
+  // Constants
+  static const _failedAttemptKeyPrefix = 'failedAttempt_';
+  static const _attemptCountKey = 'attemptCount';
+  static const _lockoutEndTimeKey = 'lockoutEndTime';
+
+  // Store a failed login attempt with a unique key
+  Future<void> addFailedAttempt(DateTime attemptTime) async {
+    final key = '$_failedAttemptKeyPrefix${attemptTime.millisecondsSinceEpoch}';
+    await _storage.write(key: key, value: attemptTime.toIso8601String());
+
+    // Increment the attempt count
+    final currentCount = await getFailedAttemptsCount();
+    await _storage.write(
+        key: _attemptCountKey, value: (currentCount + 1).toString());
+  }
+
+  // Get the total number of failed attempts
+  Future<int> getFailedAttemptsCount() async {
+    final countString = await _storage.read(key: _attemptCountKey);
+    return int.tryParse(countString ?? '0') ?? 0;
+  }
+
+  // Clear all failed attempts and reset the attempt count
+  Future<void> clearFailedAttempts() async {
+    final allKeys = await _storage.readAll();
+    for (var key in allKeys.keys) {
+      if (key.startsWith(_failedAttemptKeyPrefix)) {
+        await _storage.delete(key: key);
+      }
+    }
+    await _storage.delete(key: _attemptCountKey); // Reset the attempt count
+  }
+
+  // Set the lockout end time
+  Future<void> setLockoutEndTime(DateTime endTime) async {
+    await _storage.write(
+        key: _lockoutEndTimeKey, value: endTime.toIso8601String());
+  }
+
+  // Get the lockout end time
+  Future<DateTime?> getLockoutEndTime() async {
+    final endTimeString = await _storage.read(key: _lockoutEndTimeKey);
+    if (endTimeString != null) {
+      return DateTime.parse(endTimeString);
+    }
+    return null;
+  }
+
+  // Clear the lockout end time
+  Future<void> clearLockoutEndTime() async {
+    await _storage.delete(key: _lockoutEndTimeKey);
+  }
+}
+
 class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthenticationService _authService = AuthenticationService();
+  final SecureStorage _secureStorage = SecureStorage();
   bool _isSubmitting = false;
   bool _obscurePassword = true;
+  bool _isLockedOut = false;
+  DateTime? _lockoutEndTime;
 
   @override
   void initState() {
@@ -27,14 +88,47 @@ class _LoginPageState extends State<LoginPage> {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: const Color.fromARGB(255, 82, 138, 41),
     ));
+    _checkLockoutStatus();
+  }
+
+  Future<void> _checkLockoutStatus() async {
+    print("Checking lockout status...");
+    _lockoutEndTime = await _secureStorage.getLockoutEndTime();
+    if (_lockoutEndTime != null && DateTime.now().isBefore(_lockoutEndTime!)) {
+      print("User is locked out until $_lockoutEndTime");
+      setState(() {
+        _isLockedOut = true;
+      });
+      Future.delayed(_lockoutEndTime!.difference(DateTime.now()), () async {
+        print("Lockout period ended");
+        setState(() {
+          _isLockedOut = false;
+        });
+        await _secureStorage.clearLockoutEndTime();
+      });
+    } else {
+      print("User is not locked out");
+    }
   }
 
   void _authenticateAndLogin() async {
+    if (_isLockedOut) {
+      print("User is currently locked out.");
+      Get.snackbar(
+        'Locked Out',
+        'You are temporarily locked out. Please try again later.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     setState(() {
       _isSubmitting = true;
     });
 
     try {
+      print("Authenticating client...");
       final credentials = await getClientCredentials();
       ClientAuthResponse? clientResponse =
           await _authService.authenticateClient(
@@ -53,12 +147,7 @@ class _LoginPageState extends State<LoginPage> {
           Get.offAll(() => MainPage());
         } else {
           print('User login failed');
-          Get.snackbar(
-            'Error',
-            'Could not Login. Please Check Your Username and Password',
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-          );
+          await _handleFailedAttempt();
         }
       } else {
         print('Client authentication failed');
@@ -70,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print('An error occurred: $e');
+      print('An error occurred during authentication: $e');
       Get.snackbar(
         'Error',
         'An unexpected error occurred. Please try again.',
@@ -81,6 +170,36 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _isSubmitting = false;
       });
+    }
+  }
+
+  Future<void> _handleFailedAttempt() async {
+    print("Handling failed attempt...");
+    final failedAttempts = await _secureStorage.getFailedAttemptsCount();
+
+    if (failedAttempts >= 2) {
+      print("User locked out due to too many failed attempts");
+      final lockoutEndTime = DateTime.now().add(Duration(minutes: 5));
+      await _secureStorage.setLockoutEndTime(lockoutEndTime);
+      await _secureStorage.clearFailedAttempts(); // Clear old attempts
+      setState(() {
+        _isLockedOut = true;
+      });
+      Get.snackbar('Locked Out',
+          'You have been locked out for 5 minutes due to multiple failed login attempts. You will be able to try again at ${lockoutEndTime.toLocal()}',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          duration: Duration(seconds: 7));
+    } else {
+      print("Incrementing failed attempts");
+      await _secureStorage
+          .addFailedAttempt(DateTime.now()); // Use addFailedAttempt method
+      Get.snackbar(
+        'Error',
+        'Could not Login. Please Check Your Username and Password',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 
@@ -244,29 +363,47 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         SizedBox(height: 10),
                         Container(
-                          width: 310,
                           height: 50,
                           child: ElevatedButton(
-                            onPressed:
-                                _isSubmitting ? null : _authenticateAndLogin,
-                            child: _isSubmitting
-                                ? CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : Text(
-                                    'Login',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
+                            onPressed: _isSubmitting || _isLockedOut
+                                ? null
+                                : _authenticateAndLogin,
+                            style: ButtonStyle(
+                              elevation:
+                                  WidgetStateProperty.all(0), // Removes shadow
                               backgroundColor:
-                                  const Color.fromARGB(255, 82, 138, 41),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                  WidgetStateProperty.resolveWith<Color>(
+                                (Set<WidgetState> states) {
+                                  if (states.contains(WidgetState.disabled)) {
+                                    return Color.fromARGB(255, 157, 157,
+                                        157); // Color when disabled (locked out)
+                                  }
+                                  if (states.contains(WidgetState.pressed)) {
+                                    return Colors.grey; // Color when pressed
+                                  }
+                                  return Color.fromARGB(
+                                      255, 82, 138, 41); // Default color
+                                },
                               ),
+                              shape: WidgetStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                            child: Center(
+                              child: _isSubmitting
+                                  ? CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : Text(
+                                      _isLockedOut ? 'Locked Out' : 'Log In',
+                                      style: GoogleFonts.openSans(
+                                        fontSize: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -274,7 +411,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 0),
+                SizedBox(height: 20),
                 Image.asset(
                   'images/sash.png',
                   height: 100,
