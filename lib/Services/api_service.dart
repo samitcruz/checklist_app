@@ -10,36 +10,8 @@ import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/models/checklist_item_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'http://10.0.228.91:3331/api/v1';
+  static const String _baseUrl = 'https://10.0.2.2:7148/api/v1';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
-
-  Future<List<ChecklistItem>> getChecklistItems(int checklistId) async {
-    final tenant = dotenv.env['tenant'];
-    final clientClaim = dotenv.env['clientclaim'];
-    final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
-    final idToken = (await _storage.read(key: 'idToken'))?.trim();
-    final response = await http.get(
-      Uri.parse('$_baseUrl/ChecklistItem/by-checklist/$checklistId/'),
-      headers: {
-        'idToken': '$idToken',
-        'accessToken': '$accessToken',
-        'tenant': tenant ?? '',
-        'clientclaim': clientClaim ?? '',
-      },
-    );
-    if (response.statusCode == 200) {
-      print('Response body: ${response.body}');
-      List<dynamic> body = jsonDecode(response.body);
-      List<ChecklistItem> checklistItems =
-          body.map((dynamic item) => ChecklistItem.fromJson(item)).toList();
-      return checklistItems;
-    } else {
-      print(
-          'Failed to load checklist items with status code: ${response.statusCode}');
-
-      throw Exception('Failed to load checklist items');
-    }
-  }
 
   Future<int> createChecklist(ChecklistDto checklistDto,
       {required String? inspectingStaff,
@@ -66,6 +38,73 @@ class ApiService {
       return responseBody['id'];
     } else {
       throw Exception('Failed to create checklist');
+    }
+  }
+
+  Future<void> createMultipleChecklistItems(
+      List<ChecklistItemCreateDto> checklistItems) async {
+    final tenant = dotenv.env['tenant'] ?? '';
+    final clientClaim = dotenv.env['clientclaim'] ?? '';
+    final accessToken =
+        (await _storage.read(key: 'clientAccessToken'))?.trim() ?? '';
+    final idToken = (await _storage.read(key: 'idToken'))?.trim() ?? '';
+
+    var uri = Uri.parse('$_baseUrl/ChecklistItem/CreateMultiple');
+    var request = http.MultipartRequest('POST', uri);
+
+    request.headers.addAll({
+      'idToken': '$idToken',
+      'accessToken': '$accessToken',
+      'tenant': tenant,
+      'clientclaim': clientClaim,
+    });
+
+    // Attach files with names
+    for (var item in checklistItems) {
+      if (item.remarkImagePath != null) {
+        print('Preparing to attach file: ${item.remarkImagePath!}');
+        print('With description: ${item.description}');
+
+        try {
+          var file = await http.MultipartFile.fromPath(
+            'files',
+            item.remarkImagePath!,
+            filename: item.description,
+            contentType: MediaType('image', 'jpeg'),
+          );
+
+          print('File path: ${item.remarkImagePath!}');
+          print('File name: ${file.filename}');
+          print('Content type: ${file.contentType}');
+
+          request.files.add(file);
+        } catch (e) {
+          print('Error attaching file: $e');
+        }
+      }
+    }
+
+    // Attach JSON data
+    request.fields['checklistItemsJson'] =
+        jsonEncode(checklistItems.map((item) => item.toJson()).toList());
+
+    print('Checklist items JSON: ${request.fields['checklistItemsJson']}');
+
+    try {
+      var response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      if (response.statusCode == 200) {
+        print('Multiple checklist items created successfully');
+      } else {
+        print(
+            'Failed to create multiple checklist items. Status code: ${response.statusCode}');
+      }
+
+      print('Response body: $responseBody');
+    } catch (e) {
+      print('Error during API request: $e');
+      throw Exception('Error during API request: $e');
     }
   }
 
@@ -102,51 +141,31 @@ class ApiService {
     }
   }
 
-  Future<void> createChecklistItem(ChecklistItemCreateDto createDto) async {
+  Future<List<ChecklistItem>> getChecklistItems(int checklistId) async {
     final tenant = dotenv.env['tenant'];
     final clientClaim = dotenv.env['clientclaim'];
     final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
     final idToken = (await _storage.read(key: 'idToken'))?.trim();
-    var uri = Uri.parse('$_baseUrl/ChecklistItem/Create');
-    var request = http.MultipartRequest('POST', uri);
-    request.headers.addAll({
-      'idToken': '$idToken',
-      'accessToken': '$accessToken',
-      'tenant': tenant ?? '',
-      'clientclaim': clientClaim ?? '',
-    });
-
-    request.fields['ChecklistId'] = createDto.checklistId.toString();
-    request.fields['Description'] = createDto.description;
-    request.fields['Yes'] = createDto.yes.toString();
-    request.fields['No'] = createDto.no.toString();
-    request.fields['Na'] = createDto.na.toString();
-    if (createDto.remarkText != null) {
-      request.fields['RemarkText'] = createDto.remarkText!;
+    final response = await http.get(
+      Uri.parse('$_baseUrl/ChecklistItem/by-checklist/$checklistId/'),
+      headers: {
+        'idToken': '$idToken',
+        'accessToken': '$accessToken',
+        'tenant': tenant ?? '',
+        'clientclaim': clientClaim ?? '',
+      },
+    );
+    if (response.statusCode == 200) {
+      print('Response body: ${response.body}');
+      List<dynamic> body = jsonDecode(response.body);
+      List<ChecklistItem> checklistItems =
+          body.map((dynamic item) => ChecklistItem.fromJson(item)).toList();
+      return checklistItems;
     } else {
-      request.fields['RemarkText'] = '';
-    }
+      print(
+          'Failed to load checklist items with status code: ${response.statusCode}');
 
-    if (createDto.remarkImagePath != null) {
-      var file = await http.MultipartFile.fromPath(
-        'RemarkImage',
-        createDto.remarkImagePath!,
-        contentType: MediaType('image', 'jpeg'),
-      );
-      request.files.add(file);
-    }
-
-    try {
-      var response = await request.send();
-      var responseBody = await response.stream.bytesToString();
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Failed to create checklist item: ${response.statusCode} - $responseBody');
-      }
-      print('Response: $responseBody');
-    } catch (e) {
-      print('Error during API request: $e');
-      throw Exception('Error during API request: $e');
+      throw Exception('Failed to load checklist items');
     }
   }
 
@@ -182,6 +201,55 @@ class ApiService {
     }
   }
 }
+
+  // Future<void> createChecklistItem(ChecklistItemCreateDto createDto) async {
+  //   final tenant = dotenv.env['tenant'];
+  //   final clientClaim = dotenv.env['clientclaim'];
+  //   final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
+  //   final idToken = (await _storage.read(key: 'idToken'))?.trim();
+  //   var uri = Uri.parse('$_baseUrl/ChecklistItem/Create');
+  //   var request = http.MultipartRequest('POST', uri);
+  //   request.headers.addAll({
+  //     'idToken': '$idToken',
+  //     'accessToken': '$accessToken',
+  //     'tenant': tenant ?? '',
+  //     'clientclaim': clientClaim ?? '',
+  //   });
+
+  //   request.fields['ChecklistId'] = createDto.checklistId.toString();
+  //   request.fields['Description'] = createDto.description;
+  //   request.fields['Yes'] = createDto.yes.toString();
+  //   request.fields['No'] = createDto.no.toString();
+  //   request.fields['Na'] = createDto.na.toString();
+  //   if (createDto.remarkText != null) {
+  //     request.fields['RemarkText'] = createDto.remarkText!;
+  //   } else {
+  //     request.fields['RemarkText'] = '';
+  //   }
+
+  //   if (createDto.remarkImagePath != null) {
+  //     var file = await http.MultipartFile.fromPath(
+  //       'RemarkImage',
+  //       createDto.remarkImagePath!,
+  //       contentType: MediaType('image', 'jpeg'),
+  //     );
+  //     request.files.add(file);
+  //   }
+
+  //   try {
+  //     var response = await request.send();
+  //     var responseBody = await response.stream.bytesToString();
+  //     if (response.statusCode != 200) {
+  //       throw Exception(
+  //           'Failed to create checklist item: ${response.statusCode} - $responseBody');
+  //     }
+  //     print('Response: $responseBody');
+  //   } catch (e) {
+  //     print('Error during API request: $e');
+  //     throw Exception('Error during API request: $e');
+  //   }
+  // }
+
 
  // Future<List<Checklist>> getChecklists() async {
   //   final tenant = dotenv.env['tenant'];

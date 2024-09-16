@@ -36,9 +36,13 @@ class ChecklistController extends GetxController {
       ...readyForDepartureItems,
     ];
 
+    // Create a list to hold all ChecklistItemCreateDto objects
+    List<ChecklistItemCreateDto> checklistDtos = [];
+
     try {
+      // Convert each ChecklistItem to a ChecklistItemCreateDto
       for (var item in allItems) {
-        var createDto = ChecklistItemCreateDto(
+        checklistDtos.add(ChecklistItemCreateDto(
           checklistId: item.checklistId,
           description: item.description,
           yes: item.yes,
@@ -46,15 +50,18 @@ class ChecklistController extends GetxController {
           na: item.na,
           remarkText: item.remarkText,
           remarkImagePath: item.remarkImage,
-        );
-
-        await apiService.createChecklistItem(createDto);
+        ));
       }
+
+      // Now pass the list of ChecklistItemCreateDto to the API service
+      await apiService.createMultipleChecklistItems(checklistDtos);
+
+      // Show success message
       Get.snackbar('Success', 'You have submitted the checklist',
           backgroundColor: Colors.green, colorText: Colors.white);
     } catch (e) {
-      Get.snackbar(
-          'Error', 'Please complete all checklist items before proceeding',
+      // Handle errors
+      Get.snackbar('Error', 'Failed to submit checklist: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
     }
   }
