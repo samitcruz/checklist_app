@@ -59,7 +59,6 @@ class ApiService {
       'clientclaim': clientClaim,
     });
 
-    // Attach files with names
     for (var item in checklistItems) {
       if (item.remarkImagePath != null) {
         print('Preparing to attach file: ${item.remarkImagePath!}');
@@ -83,8 +82,6 @@ class ApiService {
         }
       }
     }
-
-    // Attach JSON data
     request.fields['checklistItemsJson'] =
         jsonEncode(checklistItems.map((item) => item.toJson()).toList());
 
