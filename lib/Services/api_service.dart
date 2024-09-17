@@ -133,6 +133,7 @@ class ApiService {
       List<dynamic> body = jsonDecode(response.body);
       List<Checklist> checklists =
           body.map((dynamic item) => Checklist.fromJson(item)).toList();
+          checklists.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       return checklists;
     } else {
       throw Exception('Failed to load checklists by inspecting staff');

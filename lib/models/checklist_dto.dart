@@ -3,6 +3,7 @@ class ChecklistDto {
   String stationName;
   String flightNumber;
   String date;
+  DateTime timestamp;
 
   ChecklistDto({
     required this.inspectingStaff,
@@ -10,6 +11,7 @@ class ChecklistDto {
     required this.flightNumber,
     required this.date,
     required List<dynamic> items,
+    required this.timestamp,
   });
 
   Map<String, dynamic> toJson() {
@@ -18,6 +20,7 @@ class ChecklistDto {
       'stationName': stationName,
       'flightNumber': flightNumber,
       'date': date,
+      'timestamp': timestamp.toIso8601String(),
     };
   }
 }

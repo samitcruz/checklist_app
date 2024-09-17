@@ -8,15 +8,16 @@ class Checklist {
   String flightNumber;
   String date;
   List<ChecklistItem>? items;
+  DateTime timestamp;
 
-  Checklist({
-    required this.id,
-    required this.inspectingStaff,
-    required this.stationName,
-    required this.flightNumber,
-    required this.date,
-    this.items,
-  });
+  Checklist(
+      {required this.id,
+      required this.inspectingStaff,
+      required this.stationName,
+      required this.flightNumber,
+      required this.date,
+      this.items,
+      required this.timestamp});
 
   factory Checklist.fromJson(Map<String, dynamic> json) {
     var itemsList = json['items'] as List?;
@@ -31,6 +32,7 @@ class Checklist {
       flightNumber: json['flightNumber'],
       date: json['date'],
       items: items,
+      timestamp: DateTime.parse(json['timestamp']),
     );
   }
 }

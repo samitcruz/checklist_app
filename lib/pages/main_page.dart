@@ -121,6 +121,7 @@ class _MainPageState extends State<MainPage> {
           flightNumber: flightNumber,
           date: date,
           items: [],
+          timestamp: DateTime.now(),
         );
 
         int checklistId = await apiService.createChecklist(
