@@ -10,7 +10,7 @@ import 'package:safety_check/models/checklist_item.dart';
 import 'package:safety_check/models/checklist_item_dto.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://10.0.2.2:7148/api/v1';
+  static const String _baseUrl = 'http://10.0.228.91:3331/api/v1';
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   Future<int> createChecklist(ChecklistDto checklistDto,
