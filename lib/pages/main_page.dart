@@ -356,7 +356,7 @@ class _MainPageState extends State<MainPage> {
         builder: (BuildContext context, BoxConstraints constraints) {
           double screenWidth = MediaQuery.of(context).size.width;
           double fieldWidth = screenWidth * 0.8;
-          double fieldtrip = screenWidth * 0.625;
+          double fieldtrip = screenWidth * 0.607;
 
           return Container(
             width: fieldWidth,
