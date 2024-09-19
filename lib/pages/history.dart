@@ -15,6 +15,7 @@ class _HistoryPageState extends State<HistoryPage> {
   String searchString = "";
   List<Checklist> checklistData = [];
   ApiService apiService = ApiService();
+  bool isLoading = true; // Track loading state
 
   @override
   void initState() {
@@ -27,9 +28,13 @@ class _HistoryPageState extends State<HistoryPage> {
       List<Checklist> data = await apiService.getChecklistsByInspectingStaff();
       setState(() {
         checklistData = data;
+        isLoading = false; // Data has been loaded
       });
     } catch (e) {
       print('Failed to fetch checklists: $e');
+      setState(() {
+        isLoading = false; // Stop loading if error occurs
+      });
     }
   }
 
@@ -88,48 +93,54 @@ class _HistoryPageState extends State<HistoryPage> {
               },
             ),
             Expanded(
-              child: ListView.separated(
-                itemCount: filteredData.length,
-                itemBuilder: (context, index) {
-                  var data = filteredData[index];
-                  String? inspector = data.inspectingStaff;
-                  String station = data.stationName;
-                  String flightNumber = data.flightNumber;
-                  String date = data.date;
+              child: isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: Color.fromARGB(255, 82, 138, 41),
+                      ),
+                    )
+                  : ListView.separated(
+                      itemCount: filteredData.length,
+                      itemBuilder: (context, index) {
+                        var data = filteredData[index];
+                        String? inspector = data.inspectingStaff;
+                        String station = data.stationName;
+                        String flightNumber = data.flightNumber;
+                        String date = data.date;
 
-                  return ListTile(
-                    title: Text(
-                      "$station - $flightNumber - $date",
-                      style: GoogleFonts.openSans(),
+                        return ListTile(
+                          title: Text(
+                            "$station - $flightNumber - $date",
+                            style: GoogleFonts.openSans(),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Inspection Officer: $inspector"),
+                              Text("Station: $station"),
+                              Text("Flight Number: $flightNumber"),
+                              Text("Date: $date"),
+                            ],
+                          ),
+                          onTap: () {
+                            Get.to(() => ChecklistPopupPage(
+                                  checklistId: data.id,
+                                  station: station,
+                                  flightNumber: flightNumber,
+                                  date: date,
+                                ));
+                          },
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return Divider(
+                          color: const Color.fromARGB(255, 82, 138, 41),
+                          thickness: 2,
+                          indent: 16,
+                          endIndent: 16,
+                        );
+                      },
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Inspection Officer: $inspector"),
-                        Text("Station: $station"),
-                        Text("Flight Number: $flightNumber"),
-                        Text("Date: $date"),
-                      ],
-                    ),
-                    onTap: () {
-                      Get.to(() => ChecklistPopupPage(
-                            checklistId: data.id,
-                            station: station,
-                            flightNumber: flightNumber,
-                            date: date,
-                          ));
-                    },
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return Divider(
-                    color: const Color.fromARGB(255, 82, 138, 41),
-                    thickness: 2,
-                    indent: 16,
-                    endIndent: 16,
-                  );
-                },
-              ),
             ),
           ],
         ),
