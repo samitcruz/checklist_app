@@ -28,12 +28,14 @@ class _HistoryPageState extends State<HistoryPage> {
       List<Checklist> data = await apiService.getChecklistsByInspectingStaff();
       setState(() {
         checklistData = data;
-        isLoading = false; // Data has been loaded
+        isLoading = false;
       });
     } catch (e) {
       print('Failed to fetch checklists: $e');
       setState(() {
-        isLoading = false; // Stop loading if error occurs
+        isLoading = false;
+        Get.snackbar('Error', 'Failed to load Checklists',
+            backgroundColor: Colors.red, colorText: Colors.white);
       });
     }
   }
