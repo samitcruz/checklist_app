@@ -122,10 +122,3 @@ class AuthenticationService {
     };
   }
 }
-
-
-
-
-  // Future<String?> getClientToken() async {
-  //   return await _storage.read(key: 'clientAccessToken');
-  // }
