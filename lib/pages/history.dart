@@ -15,7 +15,7 @@ class _HistoryPageState extends State<HistoryPage> {
   String searchString = "";
   List<Checklist> checklistData = [];
   ApiService apiService = ApiService();
-  bool isLoading = true; // Track loading state
+  bool isLoading = true; 
 
   @override
   void initState() {

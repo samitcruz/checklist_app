@@ -51,13 +51,11 @@ class SecureStorage {
     await _storage.delete(key: _attemptCountKey); // Reset the attempt count
   }
 
-  // Set the lockout end time
   Future<void> setLockoutEndTime(DateTime endTime) async {
     await _storage.write(
         key: _lockoutEndTimeKey, value: endTime.toIso8601String());
   }
 
-  // Get the lockout end time
   Future<DateTime?> getLockoutEndTime() async {
     final endTimeString = await _storage.read(key: _lockoutEndTimeKey);
     if (endTimeString != null) {
@@ -66,7 +64,6 @@ class SecureStorage {
     return null;
   }
 
-  // Clear the lockout end time
   Future<void> clearLockoutEndTime() async {
     await _storage.delete(key: _lockoutEndTimeKey);
   }
@@ -192,8 +189,7 @@ class _LoginPageState extends State<LoginPage> {
           duration: Duration(seconds: 7));
     } else {
       print("Incrementing failed attempts");
-      await _secureStorage
-          .addFailedAttempt(DateTime.now()); // Use addFailedAttempt method
+      await _secureStorage.addFailedAttempt(DateTime.now());
       Get.snackbar(
         'Error',
         'Could not Login. Please Check Your Username and Password',
@@ -369,20 +365,17 @@ class _LoginPageState extends State<LoginPage> {
                                 ? null
                                 : _authenticateAndLogin,
                             style: ButtonStyle(
-                              elevation:
-                                  WidgetStateProperty.all(0), // Removes shadow
+                              elevation: WidgetStateProperty.all(0),
                               backgroundColor:
                                   WidgetStateProperty.resolveWith<Color>(
                                 (Set<WidgetState> states) {
                                   if (states.contains(WidgetState.disabled)) {
-                                    return Color.fromARGB(255, 157, 157,
-                                        157); // Color when disabled (locked out)
+                                    return Color.fromARGB(255, 157, 157, 157);
                                   }
                                   if (states.contains(WidgetState.pressed)) {
-                                    return Colors.grey; // Color when pressed
+                                    return Colors.grey;
                                   }
-                                  return Color.fromARGB(
-                                      255, 82, 138, 41); // Default color
+                                  return Color.fromARGB(255, 82, 138, 41);
                                 },
                               ),
                               shape: WidgetStateProperty.all<
