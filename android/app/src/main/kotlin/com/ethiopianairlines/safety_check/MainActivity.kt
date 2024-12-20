@@ -1,4 +1,4 @@
-package com.example.safety_check
+package com.ethiopianairlines.safety_check
 
 import io.flutter.embedding.android.FlutterActivity
 

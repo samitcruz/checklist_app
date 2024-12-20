@@ -31,7 +31,6 @@ class _HistoryPageState extends State<HistoryPage> {
         isLoading = false;
       });
     } catch (e) {
-      print('Failed to fetch checklists: $e');
       setState(() {
         isLoading = false;
         Get.snackbar('Error', 'Failed to load Checklists',

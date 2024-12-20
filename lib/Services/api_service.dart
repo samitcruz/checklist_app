@@ -23,7 +23,9 @@ class ApiService {
     final clientClaim = dotenv.env['clientclaim'];
     final accessToken = (await _storage.read(key: 'clientAccessToken'))?.trim();
     final idToken = (await _storage.read(key: 'idToken'))?.trim();
-    final response = await http.post(
+    final String json = jsonEncode(checklistDto.toJson());
+    final response = await http
+        .post(
       Uri.parse('$_baseUrl/Checklist/Create'),
       headers: {
         'Content-Type': 'application/json',
@@ -33,7 +35,14 @@ class ApiService {
         'clientclaim': clientClaim ?? '',
       },
       body: jsonEncode(checklistDto.toJson()),
+    )
+        .timeout(
+      Duration(seconds: 40),
+      onTimeout: () {
+        throw Exception('Connection Timed Out');
+      },
     );
+    ;
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       return responseBody['id'];
@@ -62,9 +71,6 @@ class ApiService {
 
     for (var item in checklistItems) {
       if (item.remarkImagePath != null) {
-        print('Preparing to attach file: ${item.remarkImagePath!}');
-        print('With description: ${item.description}');
-
         try {
           var file = await http.MultipartFile.fromPath(
             'files',
@@ -72,22 +78,13 @@ class ApiService {
             filename: item.description,
             contentType: MediaType('image', 'jpeg'),
           );
-
-          print('File path: ${item.remarkImagePath!}');
-          print('File name: ${file.filename}');
-          print('Content type: ${file.contentType}');
-
           request.files.add(file);
         } catch (e) {
-          print('Error attaching file: $e');
         }
       }
     }
     request.fields['checklistItemsJson'] =
         jsonEncode(checklistItems.map((item) => item.toJson()).toList());
-
-    print('Checklist items JSON: ${request.fields['checklistItemsJson']}');
-
     try {
       var response = await request.send();
       final responseBody = await response.stream.bytesToString();
@@ -133,7 +130,7 @@ class ApiService {
       List<dynamic> body = jsonDecode(response.body);
       List<Checklist> checklists =
           body.map((dynamic item) => Checklist.fromJson(item)).toList();
-          checklists.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+      checklists.sort((a, b) => b.timestamp.compareTo(a.timestamp));
       return checklists;
     } else {
       throw Exception('Failed to load checklists by inspecting staff');

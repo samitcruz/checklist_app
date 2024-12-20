@@ -89,28 +89,23 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _checkLockoutStatus() async {
-    print("Checking lockout status...");
     _lockoutEndTime = await _secureStorage.getLockoutEndTime();
     if (_lockoutEndTime != null && DateTime.now().isBefore(_lockoutEndTime!)) {
-      print("User is locked out until $_lockoutEndTime");
       setState(() {
         _isLockedOut = true;
       });
       Future.delayed(_lockoutEndTime!.difference(DateTime.now()), () async {
-        print("Lockout period ended");
         setState(() {
           _isLockedOut = false;
         });
         await _secureStorage.clearLockoutEndTime();
       });
     } else {
-      print("User is not locked out");
     }
   }
 
   void _authenticateAndLogin() async {
     if (_isLockedOut) {
-      print("User is currently locked out.");
       Get.snackbar(
         'Locked Out',
         'You are temporarily locked out. Please try again later.',
@@ -125,7 +120,6 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      print("Authenticating client...");
       final credentials = await getClientCredentials();
       ClientAuthResponse? clientResponse =
           await _authService.authenticateClient(
@@ -134,20 +128,15 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       if (clientResponse != null) {
-        print('Client authenticated successfully');
-
         User? user = await _authService.login(
             _usernameController.text.trim(), _passwordController.text.trim());
 
         if (user != null) {
-          print('User logged in successfully');
           Get.offAll(() => MainPage());
         } else {
-          print('User login failed');
           await _handleFailedAttempt();
         }
       } else {
-        print('Client authentication failed');
         Get.snackbar(
           'Error',
           'Client authentication failed. Please check your credentials.',
@@ -156,7 +145,6 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      print('An error occurred during authentication: $e');
       Get.snackbar(
         'Error',
         'An unexpected error occurred. Please try again.',
@@ -171,11 +159,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleFailedAttempt() async {
-    print("Handling failed attempt...");
     final failedAttempts = await _secureStorage.getFailedAttemptsCount();
 
     if (failedAttempts >= 2) {
-      print("User locked out due to too many failed attempts");
       final lockoutEndTime = DateTime.now().add(Duration(minutes: 5));
       await _secureStorage.setLockoutEndTime(lockoutEndTime);
       await _secureStorage.clearFailedAttempts(); // Clear old attempts
@@ -188,7 +174,6 @@ class _LoginPageState extends State<LoginPage> {
           colorText: Colors.white,
           duration: Duration(seconds: 7));
     } else {
-      print("Incrementing failed attempts");
       await _secureStorage.addFailedAttempt(DateTime.now());
       Get.snackbar(
         'Error',

@@ -8,7 +8,7 @@ import 'package:safety_check/models/authentication.dart';
 class AuthenticationService {
   final _storage = FlutterSecureStorage();
   final String _baseUrl =
-      'https://api-dev-iam.ethiopianairlines.com/iam-service/api/v1';
+      'https://api-iam.ethiopianairlines.com/iam-service/api/v1';
 
   Future<User?> login(String username, String password) async {
     final url = Uri.parse('$_baseUrl/User/login');

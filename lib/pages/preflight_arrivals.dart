@@ -239,7 +239,6 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
         ));
   }
 
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -340,8 +339,6 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                                   item.yes = value!;
                                   item.no = false;
                                   item.na = false;
-                                  print(
-                                      'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                                 });
                               },
                               label: 'Yes',
@@ -355,8 +352,6 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                                   item.no = value!;
                                   item.yes = false;
                                   item.na = false;
-                                  print(
-                                      'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                                 });
                               },
                               label: 'No',
@@ -371,8 +366,7 @@ class _PreflightArrivalsState extends State<PreflightArrivals> {
                                   item.na = value!;
                                   item.yes = false;
                                   item.no = false;
-                                  print(
-                                      'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                                
                                 });
                               },
                               label: 'NA',

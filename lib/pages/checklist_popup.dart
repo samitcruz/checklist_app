@@ -27,7 +27,6 @@ class ChecklistPopupPage extends StatelessWidget {
     try {
       return await apiService.getChecklistItems(checklistId);
     } catch (e) {
-      print('Failed to fetch checklist items: $e');
       return [];
     }
   }
@@ -162,12 +161,10 @@ class ChecklistPopupPage extends StatelessWidget {
         height: 100,
         width: 100,
         errorBuilder: (context, error, stackTrace) {
-          print('Error displaying image: $error');
           return Text('Failed to load image', style: GoogleFonts.openSans());
         },
       );
     } catch (e) {
-      print('Error decoding base64 image: $e');
       return Text('Failed to decode image', style: GoogleFonts.openSans());
     }
   }

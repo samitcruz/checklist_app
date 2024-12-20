@@ -2,7 +2,7 @@
   <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:allowBackup="false"
-        android:label="ET Ground Checklist"
+        android:label="ET Ground Safety Inspection"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">

@@ -348,8 +348,6 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                                 item.yes = value!;
                                 item.no = false;
                                 item.na = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'Yes',
@@ -363,8 +361,6 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                                 item.no = value!;
                                 item.yes = false;
                                 item.na = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
                               });
                             },
                             label: 'No',
@@ -379,8 +375,7 @@ class _OnArrivalChecksState extends State<OnArrivalChecks> {
                                 item.na = value!;
                                 item.yes = false;
                                 item.no = false;
-                                print(
-                                    'Yes: ${item.yes}, No: ${item.no}, NA: ${item.na}');
+                            
                               });
                             },
                             label: 'NA',

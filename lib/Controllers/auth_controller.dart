@@ -43,14 +43,6 @@ class AuthController extends GetxController {
     final bool isAdmin = isAdminStr == 'true';
     final DateTime expiryDate =
         expiryDateStr != null ? DateTime.parse(expiryDateStr) : DateTime.now();
-    print('idToken: $idToken');
-    print('userId: $userIdStr');
-    print('username: $username');
-    print('email: $email');
-    print('firstname: $firstName');
-    print('rolesJson: $rolesJson');
-    print('organizationsJson: $organizationsJson');
-
     List<Role> roles = [];
     if (rolesJson != null) {
       final List<dynamic> rolesList = json.decode(rolesJson);
@@ -86,7 +78,6 @@ class AuthController extends GetxController {
     } else {
       _user.value = null;
     }
-    print(isAuthenticated);
   }
 
   void login(User user) {

@@ -42,9 +42,7 @@ class _MainPageState extends State<MainPage> {
     try {
       stationNames = await loadStationNames();
       setState(() {});
-    } catch (e) {
-      print("Failed to load station names: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> _loadUserInfo() async {
@@ -145,7 +143,6 @@ class _MainPageState extends State<MainPage> {
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
-        print("Error saving data to the server: $e");
       } finally {
         setState(() {
           _isSubmitting = false;
@@ -267,7 +264,7 @@ class _MainPageState extends State<MainPage> {
                     height: 250,
                   )),
                   SizedBox(height: 10),
-                  _buildAutocompleteField(),
+                  _buildDropdownField(),
                   SizedBox(height: 20),
                   _buildTextField(
                     controller: flightNumberController,
@@ -349,15 +346,14 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Widget _buildAutocompleteField() {
+  Widget _buildDropdownField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50.0),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           double screenWidth = MediaQuery.of(context).size.width;
           double fieldWidth = screenWidth * 0.8;
-          double fieldtrip = screenWidth * 0.607;
-
+          List<String> sortedStationNames = List.from(stationNames)..sort((a, b) => a.compareTo(b));
           return Container(
             width: fieldWidth,
             decoration: BoxDecoration(
@@ -365,86 +361,38 @@ class _MainPageState extends State<MainPage> {
               border: Border.all(color: Colors.white),
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Autocomplete<String>(
-              optionsBuilder: (TextEditingValue textEditingValue) {
-                if (textEditingValue.text.isEmpty) {
-                  return const Iterable<String>.empty();
-                }
-                return stationNames.where((String station) {
-                  return station
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase());
-                });
-              },
-              onSelected: (String selection) {
+            child: DropdownButtonFormField<String>(
+              menuMaxHeight: MediaQuery.of(context).size.height * 0.3,
+              value: selectedStation,
+              hint: Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('Station Name'),
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+              ),
+              onChanged: (String? newValue) {
                 setState(() {
-                  selectedStation = selection;
+                  selectedStation = newValue!;
                 });
               },
-              fieldViewBuilder: (BuildContext context,
-                  TextEditingController textEditingController,
-                  FocusNode focusNode,
-                  VoidCallback onFieldSubmitted) {
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: textEditingController,
-                        focusNode: focusNode,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 20),
-                          hintText: 'Station Name',
-                          border: InputBorder.none,
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please select a station name';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.arrow_drop_down),
-                      onPressed: () {},
-                    ),
-                  ],
-                );
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a station name';
+                }
+                return null;
               },
-              optionsViewBuilder: (BuildContext context,
-                  AutocompleteOnSelected<String> onSelected,
-                  Iterable<String> options) {
-                return Align(
-                  alignment: Alignment.topLeft,
-                  child: Material(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Container(
-                      width: fieldtrip,
-                      color: Color.fromARGB(255, 212, 211, 211),
-                      child: ListView.builder(
-                        padding: EdgeInsets.symmetric(horizontal: 8.0),
-                        itemCount: options.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final String option = options.elementAt(index);
-                          return GestureDetector(
-                            onTap: () {
-                              onSelected(option);
-                            },
-                            child: ListTile(
-                              title: Padding(
-                                padding: const EdgeInsets.only(left: 10.0),
-                                child: Text(option),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+              items:
+                  sortedStationNames.map<DropdownMenuItem<String>>((String station) {
+                return DropdownMenuItem<String>(
+                  value: station,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Text(station),
                   ),
                 );
-              },
+              }).toList(),
             ),
           );
         },
@@ -503,3 +451,4 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
+
